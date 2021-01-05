@@ -13,8 +13,8 @@ RUN go build -o ./yogo-scanner .
 # Next image - Copy built Go binary into new workspace
 FROM alpine
 
-COPY --from=builder /temp/yogo-scanner /.
-COPY --from=builder /temp/configuration.toml /.
+COPY --from=builder /temp/yogo-scanner /
+COPY --from=builder /temp/*.toml /
 
 RUN ls /
 
