@@ -3,11 +3,12 @@ package main
 import (
 	"context"
 	"fmt"
-	iex "github.com/goinvest/iexcloud/v2"
 	"github.com/alexcuse/yogo/scanner/config"
 	"github.com/alexcuse/yogo/scanner/signals"
+	iex "github.com/goinvest/iexcloud/v2"
 	"os"
 )
+
 func main() {
 	tickers := os.Args[1:]
 
@@ -34,7 +35,7 @@ func main() {
 	for ticker, quote := range q {
 		fmt.Printf("----- %s -----\n", ticker)
 		for _, s := range sig {
-			if s.Check(quote){
+			if s.Check(quote) {
 				fmt.Printf("%s matched\n", s.Name)
 			}
 		}

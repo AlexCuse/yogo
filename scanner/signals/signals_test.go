@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestCheck(t *testing.T){
+func TestCheck(t *testing.T) {
 	rule := "ChangePercent > .2"
 
 	signal, _ := signals.NewSignal("Test", rule)

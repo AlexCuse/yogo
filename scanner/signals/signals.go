@@ -1,9 +1,9 @@
 package signals
 
 import (
+	"github.com/BurntSushi/toml"
 	"github.com/antonmedv/expr"
 	"github.com/antonmedv/expr/vm"
-	"github.com/BurntSushi/toml"
 	iex "github.com/goinvest/iexcloud/v2"
 	"io/ioutil"
 	"os"
