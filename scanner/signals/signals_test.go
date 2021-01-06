@@ -12,15 +12,17 @@ func TestCheck(t *testing.T) {
 
 	signal, _ := signals.NewSignal("Test", rule)
 
-	res := signal.Check(contracts.Movement{
+	res, err := signal.Check(contracts.Movement{
 		Close: 0.6,
 	})
 
 	require.True(t, res)
+	require.Nil(t, err)
 
-	res = signal.Check(contracts.Movement{
+	res, err = signal.Check(contracts.Movement{
 		Close: 0.1,
 	})
 
 	require.False(t, res)
+	require.Nil(t, err)
 }

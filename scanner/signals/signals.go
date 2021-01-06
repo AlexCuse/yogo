@@ -15,14 +15,14 @@ type Signal struct {
 	check *vm.Program
 }
 
-func (s Signal) Check(q contracts.Movement) bool {
+func (s Signal) Check(q contracts.Movement) (bool, error) {
 	res, err := expr.Run(s.check, q)
 
 	if err != nil {
-		panic(err)
+		return false, err
 	}
 
-	return res.(bool)
+	return res.(bool), err
 }
 
 func Load(filepath string) ([]*Signal, error) {

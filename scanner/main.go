@@ -60,9 +60,9 @@ func main() {
 	for {
 		select {
 		case msg := <-input:
-			pd := contracts.Movement{}
+			movement := contracts.Movement{}
 
-			err := json.Unmarshal(msg.Payload, &pd)
+			err := json.Unmarshal(msg.Payload, &movement)
 
 			if err != nil {
 				log.Printf("unable to unmarshal message: %s", err.Error())
@@ -70,9 +70,13 @@ func main() {
 			}
 
 			for _, signal := range sig {
-				if signal.Check(pd) {
+				hit, err := signal.Check(movement)
+
+				if err != nil {
+					log.Printf(err.Error())
+				} else if hit {
 					//its a match do some shit
-					log.Printf("%s hit on %s: %+v", signal.Name, pd.Symbol, pd)
+					log.Printf("%s hit on %s: %+v", signal.Name, movement.Symbol, movement)
 				}
 			}
 
