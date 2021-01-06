@@ -12,6 +12,7 @@ type Configuration struct {
 	BrokerURL  string
 	QuoteTopic string
 	HitTopic   string
+	ScanTopic  string
 }
 
 func Load(configFile string) (Configuration, error) {

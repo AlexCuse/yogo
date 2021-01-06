@@ -6,18 +6,20 @@ import (
 
 func PreviousDayMovement(previous iex.PreviousDay) Movement {
 	return Movement{
-		Symbol: previous.Symbol,
-		Open:   previous.Open,
-		Close:  previous.Close,
-		Volume: previous.Volume,
-		Date:   Date(previous.Date),
+		Symbol:   previous.Symbol,
+		Open:     previous.Open,
+		Close:    previous.Close,
+		Volume:   previous.Volume,
+		Date:     Date(previous.Date),
+		Duration: "1d",
 	}
 }
 
 type Movement struct {
-	Symbol string
-	Open   float64
-	Close  float64
-	Volume int
-	Date   Date
+	Symbol   string
+	Open     float64
+	Close    float64
+	Volume   int
+	Date     Date
+	Duration string
 }
