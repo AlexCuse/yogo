@@ -14,7 +14,7 @@ type Signal struct {
 	check *vm.Program
 }
 
-func (s Signal) Check(q iex.Quote) bool {
+func (s Signal) Check(q iex.PreviousDay) bool {
 	res, err := expr.Run(s.check, q)
 
 	if err != nil {
@@ -56,7 +56,7 @@ func Load(filepath string) ([]*Signal, error) {
 }
 
 func NewSignal(name string, prog string) (*Signal, error) {
-	p, err := expr.Compile(prog, expr.Env(iex.Quote{}))
+	p, err := expr.Compile(prog, expr.Env(iex.PreviousDay{}))
 
 	if err != nil {
 		return nil, err

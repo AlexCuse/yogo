@@ -1,3 +1,4 @@
 
-Token = ""
-BaseURL = "https://cloud.iexapis.com/v1"
+BrokerURL = "kafka:9092"
+QuoteTopic = "yogo-quotes"
+HitTopic = "yogo-hits"

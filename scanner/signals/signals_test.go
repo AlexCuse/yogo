@@ -12,13 +12,13 @@ func TestCheck(t *testing.T) {
 
 	signal, _ := signals.NewSignal("Test", rule)
 
-	res := signal.Check(iex.Quote{
+	res := signal.Check(iex.PreviousDay{
 		ChangePercent: 0.6,
 	})
 
 	require.True(t, res)
 
-	res = signal.Check(iex.Quote{
+	res = signal.Check(iex.PreviousDay{
 		ChangePercent: 0.1,
 	})
 

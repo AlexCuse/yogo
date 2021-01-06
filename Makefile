@@ -8,5 +8,11 @@ test-scanner:
 	gofmt -l scanner/
 	[ "`gofmt -l scanner/`" = "" ]
 
-test: test-scanner
+test-quoter:
+	cd quoter && $(GO) test ./...
+	cd quoter && $(GO) vet ./...
+	gofmt -l quoter/
+	[ "`gofmt -l quoter/`" = "" ]
+
+test: test-scanner test-quoter
 

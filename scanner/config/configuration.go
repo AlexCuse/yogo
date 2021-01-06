@@ -7,12 +7,12 @@ import (
 )
 
 type Configuration struct {
-	Token   string
-	BaseURL string
+	BrokerURL  string
+	QuoteTopic string
+	HitTopic   string
 }
 
 func Load(configFile string) (Configuration, error) {
-
 	var cfg Configuration
 
 	// Read config file

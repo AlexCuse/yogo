@@ -2,15 +2,18 @@ package main
 
 import (
 	"context"
-	"fmt"
+	"encoding/json"
+	"github.com/ThreeDotsLabs/watermill"
+	"github.com/ThreeDotsLabs/watermill-kafka/v2/pkg/kafka"
 	"github.com/alexcuse/yogo/scanner/config"
 	"github.com/alexcuse/yogo/scanner/signals"
 	iex "github.com/goinvest/iexcloud/v2"
+	"log"
 	"os"
 )
 
 func main() {
-	tickers := os.Args[1:]
+	log := log.New(os.Stdout, "scanner: ", log.LstdFlags)
 
 	cfg, err := config.Load("configuration.toml")
 
@@ -24,23 +27,54 @@ func main() {
 		panic(err)
 	}
 
-	ct := iex.NewClient(cfg.Token, iex.WithBaseURL(cfg.BaseURL))
+	wml := &watermill.StdLoggerAdapter{ErrorLogger: log, InfoLogger: log}
 
-	q, err := iex.Client.BatchQuote(*ct, context.Background(), tickers)
+	sub, err := kafka.NewSubscriber(kafka.SubscriberConfig{
+		Brokers:               []string{cfg.BrokerURL},
+		Unmarshaler:           kafka.DefaultMarshaler{},
+		OverwriteSaramaConfig: kafka.DefaultSaramaSubscriberConfig(),
+	}, wml)
 
 	if err != nil {
 		panic(err)
 	}
 
-	for ticker, quote := range q {
-		fmt.Printf("----- %s -----\n", ticker)
-		for _, s := range sig {
-			if s.Check(quote) {
-				fmt.Printf("%s matched\n", s.Name)
+	/*
+		pub, err := kafka.NewPublisher(kafka.PublisherConfig{
+			Brokers:               []string{cfg.BrokerURL},
+			Marshaler:             kafka.DefaultMarshaler{},
+			OverwriteSaramaConfig: kafka.DefaultSaramaSyncPublisherConfig(),
+		}, wml)
+	*/
+
+	if err != nil {
+		panic(err)
+	}
+
+	input, err := sub.Subscribe(context.Background(), cfg.QuoteTopic)
+
+	if err != nil {
+		panic(err)
+	}
+
+	for {
+		select {
+		case msg := <-input:
+			pd := iex.PreviousDay{}
+
+			err := json.Unmarshal(msg.Payload, &pd)
+
+			if err != nil {
+				log.Printf("unable to unmarshal message: %s", err.Error())
+				continue
+			}
+
+			for _, signal := range sig {
+				if signal.Check(pd) {
+					//its a match do some shit
+					log.Printf("%s hit on %s: %+v", signal.Name, pd.Symbol, pd)
+				}
 			}
 		}
-
-		fmt.Printf("%+v\n", quote)
-		fmt.Printf("----- END %s -----\n\n", ticker)
 	}
 }
