@@ -11,6 +11,7 @@ type Configuration struct {
 	IEXBaseURL string
 	BrokerURL  string
 	QuoteTopic string
+	StatsTopic string
 	HitTopic   string
 	ScanTopic  string
 }
