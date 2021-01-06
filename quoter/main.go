@@ -6,7 +6,7 @@ import (
 	"github.com/ThreeDotsLabs/watermill"
 	"github.com/ThreeDotsLabs/watermill-kafka/v2/pkg/kafka"
 	"github.com/ThreeDotsLabs/watermill/message"
-	"github.com/alexcuse/yogo/quoter/config"
+	"github.com/alexcuse/yogo/common/config"
 	iex "github.com/goinvest/iexcloud/v2"
 	"github.com/google/uuid"
 	"github.com/hashicorp/go-multierror"
@@ -28,7 +28,7 @@ func main() {
 		panic(err)
 	}
 
-	ct := iex.NewClient(cfg.Token, iex.WithBaseURL(cfg.IEXBaseURL))
+	ct := iex.NewClient(cfg.IEXToken, iex.WithBaseURL(cfg.IEXBaseURL))
 
 	pub, err := kafka.NewPublisher(kafka.PublisherConfig{
 		Brokers:               []string{cfg.BrokerURL},
@@ -40,7 +40,7 @@ func main() {
 		panic(err)
 	}
 
-	err = http.ListenAndServe(cfg.HttpURL, listener{
+	err = http.ListenAndServe(":50100", listener{
 		log:        log,
 		iexClient:  ct,
 		publisher:  pub,

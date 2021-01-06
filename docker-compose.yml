@@ -9,6 +9,8 @@ services:
     - "50100:50100"
     restart: always
     command: [ "/yogo-quoter" ]
+    volumes:
+    - ./debug-configuration.toml:/configuration.toml
   scanner:
     build:
       context: scanner/.
@@ -16,6 +18,9 @@ services:
       - kafka
     restart: always
     command: [ "/yogo-scanner" ]
+    volumes:
+      - ./debug-configuration.toml:/configuration.toml
+      - ./debug-signals.toml:/signals.toml
 
 
 # infra

@@ -2,6 +2,7 @@ package signals
 
 import (
 	"github.com/BurntSushi/toml"
+	"github.com/alexcuse/yogo/common/contracts"
 	"github.com/antonmedv/expr"
 	"github.com/antonmedv/expr/vm"
 	iex "github.com/goinvest/iexcloud/v2"
@@ -14,7 +15,7 @@ type Signal struct {
 	check *vm.Program
 }
 
-func (s Signal) Check(q iex.PreviousDay) bool {
+func (s Signal) Check(q contracts.Movement) bool {
 	res, err := expr.Run(s.check, q)
 
 	if err != nil {

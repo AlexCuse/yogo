@@ -1,6 +1,5 @@
 
-Token = ""
+IEXToken = ""
 IEXBaseURL = "https://cloud.iexapis.com/v1"
 BrokerURL = "kafka:9092"
 QuoteTopic = "yogo-quotes"
-HttpURL = ":50100"

@@ -5,9 +5,9 @@ import (
 	"encoding/json"
 	"github.com/ThreeDotsLabs/watermill"
 	"github.com/ThreeDotsLabs/watermill-kafka/v2/pkg/kafka"
-	"github.com/alexcuse/yogo/scanner/config"
+	"github.com/alexcuse/yogo/common/config"
+	"github.com/alexcuse/yogo/common/contracts"
 	"github.com/alexcuse/yogo/scanner/signals"
-	iex "github.com/goinvest/iexcloud/v2"
 	"log"
 	"os"
 )
@@ -60,7 +60,7 @@ func main() {
 	for {
 		select {
 		case msg := <-input:
-			pd := iex.PreviousDay{}
+			pd := contracts.Movement{}
 
 			err := json.Unmarshal(msg.Payload, &pd)
 
