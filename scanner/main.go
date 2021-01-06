@@ -6,7 +6,6 @@ import (
 	"github.com/ThreeDotsLabs/watermill"
 	"github.com/ThreeDotsLabs/watermill-kafka/v2/pkg/kafka"
 	"github.com/alexcuse/yogo/common/config"
-	"github.com/alexcuse/yogo/common/contracts"
 	"github.com/alexcuse/yogo/scanner/signals"
 	"log"
 	"os"
@@ -51,7 +50,7 @@ func main() {
 		panic(err)
 	}
 
-	input, err := sub.Subscribe(context.Background(), cfg.QuoteTopic)
+	input, err := sub.Subscribe(context.Background(), cfg.ScanTopic)
 
 	if err != nil {
 		panic(err)
@@ -60,9 +59,9 @@ func main() {
 	for {
 		select {
 		case msg := <-input:
-			movement := contracts.Movement{}
+			target := signals.Target{}
 
-			err := json.Unmarshal(msg.Payload, &movement)
+			err := json.Unmarshal(msg.Payload, &target)
 
 			if err != nil {
 				log.Printf("unable to unmarshal message: %s", err.Error())
@@ -70,13 +69,13 @@ func main() {
 			}
 
 			for _, signal := range sig {
-				hit, err := signal.Check(movement)
+				hit, err := signal.Check(target)
 
 				if err != nil {
 					log.Printf(err.Error())
 				} else if hit {
 					//its a match do some shit
-					log.Printf("%s hit on %s: %+v", signal.Name, movement.Symbol, movement)
+					log.Printf("%s hit on %s: %+v", signal.Name, target.Quote.Symbol, target)
 				}
 			}
 

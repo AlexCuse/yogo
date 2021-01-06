@@ -6,11 +6,20 @@ services:
     depends_on:
       - kafka
     ports:
-    - "50100:50100"
+      - "50100:50100"
     restart: always
     command: [ "/yogo-quoter" ]
     volumes:
-    - ./debug-configuration.toml:/configuration.toml
+      - ./debug-configuration.toml:/configuration.toml
+  quote-enricher:
+    build:
+      context: quote-enricher/.
+    depends_on:
+      - kafka
+    restart: always
+    command: [ "/yogo-quote-enricher" ]
+    volumes:
+      - ./debug-configuration.toml:/configuration.toml
   scanner:
     build:
       context: scanner/.
@@ -33,7 +42,7 @@ services:
     ports:
       - "9092:9092"
     environment:
-      KAFKA_CREATE_TOPICS: "yogo-quotes:1:1,yogo-hits:1:1"
+      KAFKA_CREATE_TOPICS: "yogo-quotes:1:1,yogo-hits:1:1,yogo-scans:1:1,yogo-stats:1:1"
       KAFKA_ADVERTISED_HOST_NAME: 172.17.0.1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
     volumes:

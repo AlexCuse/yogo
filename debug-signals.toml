@@ -1,2 +1,2 @@
 
-Test = "Close > Open"
+HighVolumeGain5 = "Quote.ChangePercent > .05 and ((Quote.Volume - Stats.Avg10Volume) / Stats.Avg10Volume) > .05"

@@ -2,7 +2,6 @@ package signals
 
 import (
 	"github.com/BurntSushi/toml"
-	"github.com/alexcuse/yogo/common/contracts"
 	"github.com/antonmedv/expr"
 	"github.com/antonmedv/expr/vm"
 	iex "github.com/goinvest/iexcloud/v2"
@@ -10,13 +9,18 @@ import (
 	"os"
 )
 
+type Target struct {
+	Quote iex.PreviousDay
+	Stats iex.KeyStats
+}
+
 type Signal struct {
 	Name  string
 	check *vm.Program
 }
 
-func (s Signal) Check(q contracts.Movement) (bool, error) {
-	res, err := expr.Run(s.check, q)
+func (s Signal) Check(t Target) (bool, error) {
+	res, err := expr.Run(s.check, t)
 
 	if err != nil {
 		return false, err
@@ -57,7 +61,7 @@ func Load(filepath string) ([]*Signal, error) {
 }
 
 func NewSignal(name string, prog string) (*Signal, error) {
-	p, err := expr.Compile(prog, expr.Env(iex.PreviousDay{}))
+	p, err := expr.Compile(prog, expr.Env(Target{}))
 
 	if err != nil {
 		return nil, err
