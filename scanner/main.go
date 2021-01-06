@@ -75,6 +75,8 @@ func main() {
 					log.Printf("%s hit on %s: %+v", signal.Name, pd.Symbol, pd)
 				}
 			}
+
+			msg.Ack()
 		}
 	}
 }
