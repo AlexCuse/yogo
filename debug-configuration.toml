@@ -1,5 +1,5 @@
 
-IEXToken = ""
+IEXToken = "pk_f191408ce9df43e9907b70b0f4fb6f3f"
 IEXBaseURL = "https://cloud.iexapis.com/v1"
 BrokerURL = "kafka:9092"
 QuoteTopic = "yogo-quotes"
@@ -7,3 +7,4 @@ HitTopic = "yogo-hits"
 ScanTopic = "yogo-scans"
 StatsTopic = "yogo-stats"
 HttpURL = ":50100"
+LogLevel = "DEBUG"

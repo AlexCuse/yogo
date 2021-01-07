@@ -7,26 +7,29 @@ import (
 	"github.com/ThreeDotsLabs/watermill-kafka/v2/pkg/kafka"
 	"github.com/alexcuse/yogo/common/config"
 	"github.com/alexcuse/yogo/scanner/signals"
-	"log"
-	"os"
+	"github.com/sirupsen/logrus"
 )
 
 func main() {
-	log := log.New(os.Stdout, "scanner: ", log.LstdFlags)
-
 	cfg, err := config.Load("configuration.toml")
-
 	if err != nil {
 		panic(err)
 	}
+
+	log := logrus.New()
+	if cfg.LogLevel != "" {
+		if level, err := logrus.ParseLevel(cfg.LogLevel); err == nil {
+			log.SetLevel(level)
+		}
+	}
+
+	wml := watermill.NewStdLoggerWithOut(log.Out, true, false)
 
 	sig, err := signals.Load("signals.toml")
 
 	if err != nil {
 		panic(err)
 	}
-
-	wml := &watermill.StdLoggerAdapter{ErrorLogger: log, InfoLogger: log}
 
 	sub, err := kafka.NewSubscriber(kafka.SubscriberConfig{
 		Brokers:               []string{cfg.BrokerURL},
@@ -64,7 +67,7 @@ func main() {
 			err := json.Unmarshal(msg.Payload, &target)
 
 			if err != nil {
-				log.Printf("unable to unmarshal message: %s", err.Error())
+				log.Errorf("unable to unmarshal message: %s", err.Error())
 				continue
 			}
 
@@ -72,10 +75,10 @@ func main() {
 				hit, err := signal.Check(target)
 
 				if err != nil {
-					log.Printf(err.Error())
+					log.Errorf(err.Error())
 				} else if hit {
 					//its a match do some shit
-					log.Printf("%s hit on %s: %+v", signal.Name, target.Quote.Symbol, target)
+					log.Infof("%s hit on %s: %+v", signal.Name, target.Quote.Symbol, target)
 				}
 			}
 

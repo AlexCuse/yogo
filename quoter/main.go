@@ -10,9 +10,8 @@ import (
 	iex "github.com/goinvest/iexcloud/v2"
 	"github.com/google/uuid"
 	"github.com/hashicorp/go-multierror"
-	"log"
+	"github.com/sirupsen/logrus"
 	"net/http"
-	"os"
 )
 
 type input struct {
@@ -20,13 +19,19 @@ type input struct {
 }
 
 func main() {
-	log := log.New(os.Stdout, "quoter: ", log.LstdFlags)
-
 	cfg, err := config.Load("configuration.toml")
-
 	if err != nil {
 		panic(err)
 	}
+
+	log := logrus.New()
+	if cfg.LogLevel != "" {
+		if level, err := logrus.ParseLevel(cfg.LogLevel); err == nil {
+			log.SetLevel(level)
+		}
+	}
+
+	wml := watermill.NewStdLoggerWithOut(log.Out, true, false)
 
 	ct := iex.NewClient(cfg.IEXToken, iex.WithBaseURL(cfg.IEXBaseURL))
 
@@ -34,7 +39,7 @@ func main() {
 		Brokers:               []string{cfg.BrokerURL},
 		Marshaler:             kafka.DefaultMarshaler{},
 		OverwriteSaramaConfig: kafka.DefaultSaramaSyncPublisherConfig(),
-	}, &watermill.StdLoggerAdapter{ErrorLogger: log, InfoLogger: log})
+	}, wml)
 
 	if err != nil {
 		panic(err)
@@ -52,7 +57,7 @@ func main() {
 
 type listener struct {
 	quoteTopic string
-	log        *log.Logger
+	log        *logrus.Logger
 	iexClient  *iex.Client
 	publisher  message.Publisher
 }
@@ -100,6 +105,7 @@ func (l listener) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	finalError := processingErrs.ErrorOrNil()
 
 	if finalError != nil {
+		l.log.Error(finalError.Error())
 		writer.WriteHeader(500)
 		writer.Write([]byte(finalError.Error()))
 		return

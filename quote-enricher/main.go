@@ -9,20 +9,23 @@ import (
 	"github.com/alexcuse/yogo/common/config"
 	iex "github.com/goinvest/iexcloud/v2"
 	"github.com/google/uuid"
-	"log"
-	"os"
+	"github.com/sirupsen/logrus"
 )
 
 func main() {
-	log := log.New(os.Stdout, "quote-enricher: ", log.LstdFlags)
-
 	cfg, err := config.Load("configuration.toml")
-
 	if err != nil {
 		panic(err)
 	}
 
-	wml := &watermill.StdLoggerAdapter{ErrorLogger: log, InfoLogger: log}
+	log := logrus.New()
+	if cfg.LogLevel != "" {
+		if level, err := logrus.ParseLevel(cfg.LogLevel); err == nil {
+			log.SetLevel(level)
+		}
+	}
+
+	wml := watermill.NewStdLoggerWithOut(log.Out, true, false)
 
 	sub, err := kafka.NewSubscriber(kafka.SubscriberConfig{
 		Brokers:               []string{cfg.BrokerURL},
@@ -58,7 +61,7 @@ func main() {
 			err := json.Unmarshal(msg.Payload, &movement)
 
 			if err != nil {
-				log.Printf("unable to unmarshal message: %s", err.Error())
+				log.Errorf("unable to unmarshal message: %s", err.Error())
 				continue
 			}
 
@@ -67,26 +70,26 @@ func main() {
 			keystats, err := iexClient.KeyStats(context.Background(), movement.Symbol)
 
 			if err != nil {
-				log.Printf("Could not retrieve key stats: %s", err.Error())
+				log.Errorf("Could not retrieve key stats: %s", err.Error())
 				continue
 			}
 
 			statsPl, err := json.Marshal(keystats)
 
 			if err != nil {
-				log.Printf("Could not marshal key stats: %s", err.Error())
+				log.Errorf("Could not marshal key stats: %s", err.Error())
 			}
 
 			err = pub.Publish(cfg.StatsTopic, message.NewMessage(uuid.New().String(), statsPl))
 
 			if err != nil {
-				log.Printf("Could not publish stats: %s", err.Error())
+				log.Errorf("Could not publish stats: %s", err.Error())
 				continue
 			}
 
-			scannable := struct{
+			scannable := struct {
 				Quote iex.PreviousDay `json:"quote"`
-				Stats iex.KeyStats `json:"stats"`
+				Stats iex.KeyStats    `json:"stats"`
 			}{
 				Quote: movement,
 				Stats: keystats,
@@ -95,13 +98,13 @@ func main() {
 			pl, err := json.Marshal(scannable)
 
 			if err != nil {
-				log.Printf("Could not marshal enriched payload: %s", err.Error())
+				log.Errorf("Could not marshal enriched payload: %s", err.Error())
 			}
 
 			err = pub.Publish(cfg.ScanTopic, message.NewMessage(msg.UUID, pl))
 
 			if err != nil {
-				log.Printf("Could not publish enriched payload: %s", err.Error())
+				log.Errorf("Could not publish enriched payload: %s", err.Error())
 				continue
 			}
 

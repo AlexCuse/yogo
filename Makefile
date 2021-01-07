@@ -20,5 +20,11 @@ test-quoter:
 	gofmt -l quoter/
 	[ "`gofmt -l quoter/`" = "" ]
 
-test: test-common test-scanner test-quoter
+test-quote-enricher:
+	cd quote-enricher && $(GO) test ./...
+	cd quote-enricher && $(GO) vet ./...
+	gofmt -l quote-enricher/
+	[ "`gofmt -l quote-enricher/`" = "" ]
+
+test: test-common test-scanner test-quoter test-quote-enricher
 
