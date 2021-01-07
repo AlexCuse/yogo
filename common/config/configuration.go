@@ -14,6 +14,7 @@ type Configuration struct {
 	StatsTopic string
 	HitTopic   string
 	ScanTopic  string
+	LogLevel   string
 }
 
 func Load(configFile string) (Configuration, error) {
