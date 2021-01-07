@@ -3,29 +3,15 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"github.com/ThreeDotsLabs/watermill"
 	"github.com/ThreeDotsLabs/watermill-kafka/v2/pkg/kafka"
 	"github.com/ThreeDotsLabs/watermill/message"
-	"github.com/alexcuse/yogo/common/config"
+	"github.com/alexcuse/yogo/common"
 	iex "github.com/goinvest/iexcloud/v2"
 	"github.com/google/uuid"
-	"github.com/sirupsen/logrus"
 )
 
 func main() {
-	cfg, err := config.Load("configuration.toml")
-	if err != nil {
-		panic(err)
-	}
-
-	log := logrus.New()
-	if cfg.LogLevel != "" {
-		if level, err := logrus.ParseLevel(cfg.LogLevel); err == nil {
-			log.SetLevel(level)
-		}
-	}
-
-	wml := watermill.NewStdLoggerWithOut(log.Out, true, false)
+	cfg, log, wml := common.Bootstrap("configuration.toml")
 
 	sub, err := kafka.NewSubscriber(kafka.SubscriberConfig{
 		Brokers:               []string{cfg.BrokerURL},

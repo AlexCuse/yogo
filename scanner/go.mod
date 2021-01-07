@@ -8,7 +8,7 @@ require (
 	github.com/BurntSushi/toml v0.3.1
 	github.com/ThreeDotsLabs/watermill v1.1.1
 	github.com/ThreeDotsLabs/watermill-kafka/v2 v2.2.0
-	github.com/alexcuse/yogo/common v0.0.0-20210107005149-fae7dfb4ffc1
+	github.com/alexcuse/yogo/common v0.0.0-20210107010429-058b8a0d1cef
 	github.com/antonmedv/expr v1.8.9
 	github.com/goinvest/iexcloud/v2 v2.13.0
 	github.com/sirupsen/logrus v1.7.0

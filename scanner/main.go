@@ -3,27 +3,13 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"github.com/ThreeDotsLabs/watermill"
 	"github.com/ThreeDotsLabs/watermill-kafka/v2/pkg/kafka"
-	"github.com/alexcuse/yogo/common/config"
+	"github.com/alexcuse/yogo/common"
 	"github.com/alexcuse/yogo/scanner/signals"
-	"github.com/sirupsen/logrus"
 )
 
 func main() {
-	cfg, err := config.Load("configuration.toml")
-	if err != nil {
-		panic(err)
-	}
-
-	log := logrus.New()
-	if cfg.LogLevel != "" {
-		if level, err := logrus.ParseLevel(cfg.LogLevel); err == nil {
-			log.SetLevel(level)
-		}
-	}
-
-	wml := watermill.NewStdLoggerWithOut(log.Out, true, false)
+	cfg, log, wml := common.Bootstrap("configuration.toml")
 
 	sig, err := signals.Load("signals.toml")
 
