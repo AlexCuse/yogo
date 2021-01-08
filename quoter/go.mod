@@ -8,6 +8,7 @@ require (
 	github.com/ThreeDotsLabs/watermill v1.1.1
 	github.com/ThreeDotsLabs/watermill-kafka/v2 v2.2.0
 	github.com/alexcuse/yogo/common v0.0.0-20210107010429-058b8a0d1cef
+	github.com/gofiber/fiber/v2 v2.3.2
 	github.com/goinvest/iexcloud/v2 v2.13.0
 	github.com/google/uuid v1.1.1
 	github.com/hashicorp/go-multierror v1.1.0
