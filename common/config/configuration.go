@@ -1,9 +1,10 @@
 package config
 
 import (
-	"github.com/BurntSushi/toml"
 	"io/ioutil"
 	"os"
+
+	"github.com/BurntSushi/toml"
 )
 
 type Configuration struct {
@@ -15,6 +16,7 @@ type Configuration struct {
 	HitTopic   string
 	ScanTopic  string
 	LogLevel   string
+	DSN        string
 }
 
 func Load(configFile string) (Configuration, error) {

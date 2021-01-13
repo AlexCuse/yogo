@@ -1,4 +1,4 @@
-version: '2'
+version: "2"
 services:
   quoter:
     build:
@@ -8,7 +8,7 @@ services:
     ports:
       - "50100:50100"
     restart: always
-    command: [ "/yogo-quoter" ]
+    command: ["/yogo-quoter"]
     volumes:
       - ./debug-configuration.toml:/configuration.toml
   quote-enricher:
@@ -17,7 +17,7 @@ services:
     depends_on:
       - kafka
     restart: always
-    command: [ "/yogo-quote-enricher" ]
+    command: ["/yogo-quote-enricher"]
     volumes:
       - ./debug-configuration.toml:/configuration.toml
   scanner:
@@ -26,13 +26,22 @@ services:
     depends_on:
       - kafka
     restart: always
-    command: [ "/yogo-scanner" ]
+    command: ["/yogo-scanner"]
     volumes:
       - ./debug-configuration.toml:/configuration.toml
       - ./debug-signals.toml:/signals.toml
+  history:
+    build:
+      context: history/.
+    depends_on:
+      - kafka
+      - pg
+    restart: always
+    command: ["/yogo-history"]
+    volumes:
+      - ./debug-configuration.toml:/configuration.toml
 
-
-# infra
+  # infra
   zookeeper:
     image: wurstmeister/zookeeper
     ports:
@@ -42,8 +51,19 @@ services:
     ports:
       - "9092:9092"
     environment:
-      KAFKA_CREATE_TOPICS: "yogo-quotes:1:1,yogo-hits:1:1,yogo-scans:1:1,yogo-stats:1:1"
+      KAFKA_CREATE_TOPICS: "yogo-quotes:2:1,yogo-hits:1:1,yogo-scans:1:1,yogo-stats:1:1"
       KAFKA_ADVERTISED_HOST_NAME: 172.17.0.1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - zookeeper
+  pg:
+    image: postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=yogo
+      - POSTGRES_USER=yogo
+      - POSTGRES_PASSWORD=yogo
