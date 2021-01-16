@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"github.com/ThreeDotsLabs/watermill/message"
+	"github.com/sirupsen/logrus"
 	"time"
 
 	"github.com/ThreeDotsLabs/watermill-kafka/v2/pkg/kafka"
@@ -36,14 +38,39 @@ func main() {
 		panic(err)
 	}
 
-	ctx := context.Background()
-	input, err := sub.Subscribe(ctx, cfg.QuoteTopic)
+	err = db.AutoMigrate(&Stats{})
 	if err != nil {
 		panic(err)
 	}
 
+	ctx := context.Background()
+	movements, err := sub.Subscribe(ctx, cfg.QuoteTopic)
+	if err != nil {
+		panic(err)
+	}
+
+	//add waitgroup etc
+	go processMovements(db, ctx, movements, log)
+
+	stats, err := sub.Subscribe(ctx, cfg.StatsTopic)
+	if err != nil {
+		panic(err)
+	}
+
+	go processStats(db, ctx, stats, log)
+
+	select {
+		case <- ctx.Done():
+			return
+	}
+}
+
+func processMovements(db *gorm.DB, ctx context.Context, input <-chan *message.Message, log *logrus.Logger) {
 	for {
 		select {
+		case <-ctx.Done():
+			return
+
 		case msg := <-input:
 			movement := iex.PreviousDay{}
 
@@ -66,7 +93,44 @@ func main() {
 	}
 }
 
+func processStats(db *gorm.DB, ctx context.Context, input <-chan *message.Message, log *logrus.Logger) {
+	for {
+		select {
+		case <-ctx.Done():
+			return
+
+		case msg := <-input:
+			tickerStats := struct {
+				Stats iex.KeyStats
+				Ticker string
+			}{}
+
+			if err := json.Unmarshal(msg.Payload, &tickerStats); err != nil {
+				log.Errorf("unable to unmarshal message: %s", err.Error())
+				continue
+			}
+
+			if r := db.WithContext(ctx).Clauses(clause.OnConflict{DoNothing: true}).Create(Stats{
+				Symbol: tickerStats.Ticker,
+				Date:   time.Now(),
+				Data:   datatypes.JSON(msg.Payload),
+			}); r.Error != nil {
+				log.Errorf("unable to persist stats: %s", r.Error.Error())
+				continue
+			}
+
+			msg.Ack()
+		}
+	}
+}
+
 type Movement struct {
+	Symbol string    `gorm:"primaryKey;autoIncrement:false"`
+	Date   time.Time `gorm:"primaryKey;autoIncrement:false"`
+	Data   datatypes.JSON
+}
+
+type Stats struct {
 	Symbol string    `gorm:"primaryKey;autoIncrement:false"`
 	Date   time.Time `gorm:"primaryKey;autoIncrement:false"`
 	Data   datatypes.JSON
