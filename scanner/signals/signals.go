@@ -15,8 +15,9 @@ type Target struct {
 }
 
 type Signal struct {
-	Name  string
-	check *vm.Program
+	Name   string
+	Source string
+	check  *vm.Program
 }
 
 func (s Signal) Check(t Target) (bool, error) {

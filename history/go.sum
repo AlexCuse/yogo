@@ -15,6 +15,8 @@ github.com/alexcuse/iexcloud/v2 v2.13.1-0.20210106125043-90ce0f2e6164 h1:XYwobTK
 github.com/alexcuse/iexcloud/v2 v2.13.1-0.20210106125043-90ce0f2e6164/go.mod h1:ea1t+5Zax/fUbgmNV0ikWku/xcUg0UeKr0Eo2v/nYpQ=
 github.com/alexcuse/yogo/common v0.0.0-20210107010429-058b8a0d1cef h1:vgwVnMNO0a2LLyDkK1ahWNr2j9Bvk4NhN1gjciN23sk=
 github.com/alexcuse/yogo/common v0.0.0-20210107010429-058b8a0d1cef/go.mod h1:BmCW+StYZmQ3agrRmMeTKR+Cd/Wy/6mL2kXh32r/zTg=
+github.com/alexcuse/yogo/common v0.0.0-20210113214735-bc05de6dbb92 h1:S5dtabtDv8Qd/Npmfkjo0D5oQgvneRLLcVW0Sb+TQPk=
+github.com/alexcuse/yogo/common v0.0.0-20210113214735-bc05de6dbb92/go.mod h1:BmCW+StYZmQ3agrRmMeTKR+Cd/Wy/6mL2kXh32r/zTg=
 github.com/beorn7/perks v0.0.0-20180321164747-3a771d992973/go.mod h1:Dwedo/Wpr24TaqPxmxbtue+5NUziq4I4S80YR8gNf3Q=
 github.com/beorn7/perks v1.0.0/go.mod h1:KWe93zE9D1o94FZ5RNwFwVgaQK1VOXiVxmqh+CedLV8=
 github.com/cenkalti/backoff/v3 v3.0.0/go.mod h1:cIeZDE3IrqwwJl6VUwCN6trj1oXrTS4rc0ij+ULvLYs=

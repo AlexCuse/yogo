@@ -60,7 +60,13 @@ func main() {
 				continue
 			}
 
-			statsPl, err := json.Marshal(keystats)
+			statsPl, err := json.Marshal(struct {
+				Stats  iex.KeyStats
+				Ticker string
+			}{
+				Stats:  keystats,
+				Ticker: movement.Symbol,
+			})
 
 			if err != nil {
 				log.Errorf("Could not marshal key stats: %s", err.Error())
