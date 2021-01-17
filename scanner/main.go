@@ -2,73 +2,29 @@ package main
 
 import (
 	"context"
-	"encoding/json"
-	"github.com/ThreeDotsLabs/watermill-kafka/v2/pkg/kafka"
 	"github.com/alexcuse/yogo/common"
 	"github.com/alexcuse/yogo/scanner/signals"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 func main() {
 	cfg, log, wml := common.Bootstrap("configuration.toml")
 
-	sig, err := signals.Load("signals.toml")
+	db, err := gorm.Open(postgres.Open(cfg.DSN), &gorm.Config{})
+	if err != nil {
+		panic(err)
+	}
+
+	err = db.AutoMigrate(&signals.Signal{})
 
 	if err != nil {
 		panic(err)
 	}
 
-	sub, err := kafka.NewSubscriber(kafka.SubscriberConfig{
-		Brokers:               []string{cfg.BrokerURL},
-		Unmarshaler:           kafka.DefaultMarshaler{},
-		OverwriteSaramaConfig: kafka.DefaultSaramaSubscriberConfig(),
-	}, wml)
+	ctx := context.Background()
 
-	if err != nil {
-		panic(err)
-	}
+	server := signals.NewServer(cfg, ctx, db, log, wml)
 
-	/*
-		pub, err := kafka.NewPublisher(kafka.PublisherConfig{
-			Brokers:               []string{cfg.BrokerURL},
-			Marshaler:             kafka.DefaultMarshaler{},
-			OverwriteSaramaConfig: kafka.DefaultSaramaSyncPublisherConfig(),
-		}, wml)
-	*/
-
-	if err != nil {
-		panic(err)
-	}
-
-	input, err := sub.Subscribe(context.Background(), cfg.ScanTopic)
-
-	if err != nil {
-		panic(err)
-	}
-
-	for {
-		select {
-		case msg := <-input:
-			target := signals.Target{}
-
-			err := json.Unmarshal(msg.Payload, &target)
-
-			if err != nil {
-				log.Errorf("unable to unmarshal message: %s", err.Error())
-				continue
-			}
-
-			for _, signal := range sig {
-				hit, err := signal.Check(target)
-
-				if err != nil {
-					log.Errorf(err.Error())
-				} else if hit {
-					//its a match do some shit
-					log.Infof("%s hit on %s: %+v", signal.Name, target.Quote.Symbol, target)
-				}
-			}
-
-			msg.Ack()
-		}
-	}
+	log.Fatal(server.Run())
 }

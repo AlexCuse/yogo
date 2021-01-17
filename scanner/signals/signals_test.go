@@ -8,11 +8,14 @@ import (
 )
 
 func TestCheck(t *testing.T) {
-	rule := "Quote.Close > .2"
+	sig := signals.Signal{
+		Name:   "Test",
+		Source: "Quote.Close > .2",
+	}
 
-	signal, _ := signals.NewSignal("Test", rule)
+	scan, _ := signals.NewScan(sig)
 
-	res, err := signal.Check(signals.Target{
+	res, err := scan.Check(signals.Target{
 		Quote: iex.PreviousDay{
 			Close: .6,
 		},
@@ -22,7 +25,7 @@ func TestCheck(t *testing.T) {
 	require.True(t, res)
 	require.Nil(t, err)
 
-	res, err = signal.Check(signals.Target{
+	res, err = scan.Check(signals.Target{
 		Quote: iex.PreviousDay{
 			Close: .1,
 		},
