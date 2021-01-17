@@ -4,6 +4,10 @@ FROM golang:1.15-alpine AS builder
 # RUN apk update && apk add --no-cache make git gcc libc-dev libsodium-dev zeromq-dev
 WORKDIR /temp
 
+RUN apk add git
+ARG GITHUB_KEY
+RUN git config --global url."https://golang:$GITHUB_KEY@github.com".insteadOf "https://github.com"
+
 COPY . .
 
 RUN go mod download
