@@ -151,8 +151,9 @@ func (server Server) Delete(ctx *fib.Ctx) error {
 }
 
 func (server Server) Run() error {
-	server.app.Post("server/signal", server.Save)
-	server.app.Put("server/signal", server.Save)
+	server.app.Post("api/signal", server.Save)
+	server.app.Put("api/signal", server.Save)
+	server.app.Delete("api/signal", server.Delete)
 
 	go func(s Server) {
 		s.background()
