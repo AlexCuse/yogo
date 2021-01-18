@@ -11,6 +11,7 @@ require (
 	github.com/antonmedv/expr v1.8.9
 	github.com/gofiber/fiber/v2 v2.3.3
 	github.com/goinvest/iexcloud/v2 v2.13.0
+	github.com/google/uuid v1.1.1
 	github.com/sirupsen/logrus v1.7.0
 	github.com/stretchr/testify v1.6.1
 	gorm.io/driver/postgres v1.0.6

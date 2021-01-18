@@ -4,6 +4,7 @@ import (
 	"github.com/antonmedv/expr"
 	"github.com/antonmedv/expr/vm"
 	iex "github.com/goinvest/iexcloud/v2"
+	"time"
 )
 
 type Target struct {
@@ -19,6 +20,12 @@ type Signal struct {
 type Scan struct {
 	Signal
 	check *vm.Program
+}
+
+type hit struct {
+	RuleName  string
+	Symbol    string
+	QuoteDate time.Time
 }
 
 func (s Scan) Check(t Target) (bool, error) {

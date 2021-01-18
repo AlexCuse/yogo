@@ -7,12 +7,15 @@ import (
 	"fmt"
 	"github.com/ThreeDotsLabs/watermill"
 	"github.com/ThreeDotsLabs/watermill-kafka/v2/pkg/kafka"
+	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/alexcuse/yogo/common/config"
 	fib "github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 	"strings"
+	"time"
 )
 
 type Server struct {
@@ -194,13 +197,24 @@ func (server Server) background() {
 			}
 
 			for _, scan := range server.readScans() {
-				hit, err := scan.Check(target)
+				match, err := scan.Check(target)
 
 				if err != nil {
 					server.log.Errorf("problem processing scan %s: (%s)", scan.Name, err.Error())
-				} else if hit {
-					//its a match do some shit
+				} else if match {
 					server.log.Infof("%s hit on %s: %+v", scan.Name, target.Quote.Symbol, target)
+
+					rslt, err := json.Marshal(hit{
+						RuleName:  scan.Name,
+						Symbol:    target.Quote.Symbol,
+						QuoteDate: time.Time(target.Quote.Date),
+					})
+
+					if err != nil {
+						server.log.Errorf("problem sending match for %s: (%s)", scan.Name, err.Error())
+					}
+
+					server.pub.Publish(server.cfg.HitTopic, message.NewMessage(uuid.New().String(), rslt))
 				}
 			}
 
