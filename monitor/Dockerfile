@@ -12,14 +12,14 @@ COPY . .
 
 RUN go mod download
 
-RUN go build -o ./yogo-quoter .
+RUN go build -o ./yogo-monitor .
 
 # Next image - Copy built Go binary into new workspace
 FROM alpine
 
-COPY --from=builder /temp/yogo-quoter /.
+COPY --from=builder /temp/yogo-monitor /.
 COPY --from=builder /temp/configuration.toml /.
 
 RUN ls /
 
-CMD [ "/yogo-quoter" ]
+CMD [ "/yogo-monitor" ]

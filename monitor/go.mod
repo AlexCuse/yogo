@@ -1,4 +1,4 @@
-module github.com/alexcuse/yogo/quoter
+module github.com/alexcuse/yogo/monitor
 
 go 1.15
 

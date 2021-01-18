@@ -1,14 +1,14 @@
 version: "2"
 services:
-  quoter:
+  monitor:
     build:
-      context: quoter/.
+      context: monitor/.
     depends_on:
       - kafka
     ports:
       - "50100:50100"
     restart: always
-    command: ["/yogo-quoter"]
+    command: ["/yogo-monitor"]
     volumes:
       - ./debug-configuration.toml:/configuration.toml
   quote-enricher:
