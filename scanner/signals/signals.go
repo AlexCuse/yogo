@@ -1,12 +1,10 @@
 package signals
 
 import (
-	"github.com/BurntSushi/toml"
 	"github.com/antonmedv/expr"
 	"github.com/antonmedv/expr/vm"
 	iex "github.com/goinvest/iexcloud/v2"
-	"io/ioutil"
-	"os"
+	"time"
 )
 
 type Target struct {
@@ -15,12 +13,22 @@ type Target struct {
 }
 
 type Signal struct {
-	Name   string
+	Name   string `gorm:"primaryKey;autoIncrement:false"`
 	Source string
-	check  *vm.Program
 }
 
-func (s Signal) Check(t Target) (bool, error) {
+type Scan struct {
+	Signal
+	check *vm.Program
+}
+
+type hit struct {
+	RuleName  string
+	Symbol    string
+	QuoteDate time.Time
+}
+
+func (s Scan) Check(t Target) (bool, error) {
 	res, err := expr.Run(s.check, t)
 
 	if err != nil {
@@ -30,46 +38,15 @@ func (s Signal) Check(t Target) (bool, error) {
 	return res.(bool), err
 }
 
-func Load(filepath string) ([]*Signal, error) {
-
-	var input map[string]string
-
-	// Read config file
-	f, err := os.Open(filepath)
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close()
-	buf, err := ioutil.ReadAll(f)
-	if err != nil {
-		return nil, err
-	}
-	err = toml.Unmarshal(buf, &input)
-
-	signals := make([]*Signal, 0)
-
-	for name, prog := range input {
-		s, err := NewSignal(name, prog)
-
-		if err != nil {
-			panic(err)
-		}
-
-		signals = append(signals, s)
-	}
-
-	return signals, nil
-}
-
-func NewSignal(name string, prog string) (*Signal, error) {
-	p, err := expr.Compile(prog, expr.Env(Target{}))
+func NewScan(sig Signal) (*Scan, error) {
+	p, err := expr.Compile(sig.Source, expr.Env(Target{}))
 
 	if err != nil {
 		return nil, err
 	}
 
-	return &Signal{
-		Name:  name,
-		check: p,
+	return &Scan{
+		Signal: sig,
+		check:  p,
 	}, nil
 }

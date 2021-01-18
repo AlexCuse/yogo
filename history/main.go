@@ -43,6 +43,11 @@ func main() {
 		panic(err)
 	}
 
+	err = db.AutoMigrate(&Hit{})
+	if err != nil {
+		panic(err)
+	}
+
 	ctx := context.Background()
 	movements, err := sub.Subscribe(ctx, cfg.QuoteTopic)
 	if err != nil {
@@ -59,9 +64,16 @@ func main() {
 
 	go processStats(db, ctx, stats, log)
 
+	hits, err := sub.Subscribe(ctx, cfg.HitTopic)
+	if err != nil {
+		panic(err)
+	}
+
+	go processHits(db, ctx, hits, log)
+
 	select {
-		case <- ctx.Done():
-			return
+	case <-ctx.Done():
+		return
 	}
 }
 
@@ -101,7 +113,7 @@ func processStats(db *gorm.DB, ctx context.Context, input <-chan *message.Messag
 
 		case msg := <-input:
 			tickerStats := struct {
-				Stats iex.KeyStats
+				Stats  iex.KeyStats
 				Ticker string
 			}{}
 
@@ -124,6 +136,30 @@ func processStats(db *gorm.DB, ctx context.Context, input <-chan *message.Messag
 	}
 }
 
+func processHits(db *gorm.DB, ctx context.Context, input <-chan *message.Message, log *logrus.Logger) {
+	for {
+		select {
+		case <-ctx.Done():
+			return
+
+		case msg := <-input:
+			hit := Hit{}
+
+			if err := json.Unmarshal(msg.Payload, &hit); err != nil {
+				log.Errorf("unable to unmarshal message: %s", err.Error())
+				continue
+			}
+
+			if r := db.WithContext(ctx).Clauses(clause.OnConflict{DoNothing: true}).Create(hit); r.Error != nil {
+				log.Errorf("unable to persist hit: %s", r.Error.Error())
+				continue
+			}
+
+			msg.Ack()
+		}
+	}
+}
+
 type Movement struct {
 	Symbol string    `gorm:"primaryKey;autoIncrement:false"`
 	Date   time.Time `gorm:"primaryKey;autoIncrement:false"`
@@ -134,4 +170,10 @@ type Stats struct {
 	Symbol string    `gorm:"primaryKey;autoIncrement:false"`
 	Date   time.Time `gorm:"primaryKey;autoIncrement:false"`
 	Data   datatypes.JSON
+}
+
+type Hit struct {
+	RuleName  string    `gorm:"primaryKey;autoIncrement:false"`
+	Symbol    string    `gorm:"primaryKey;autoIncrement:false"`
+	QuoteDate time.Time `gorm:"primaryKey;autoIncrement:false"`
 }

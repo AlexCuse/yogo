@@ -13,8 +13,8 @@ github.com/alecthomas/template v0.0.0-20160405071501-a0175ee3bccc/go.mod h1:LOuy
 github.com/alecthomas/units v0.0.0-20151022065526-2efee857e7cf/go.mod h1:ybxpYRFXyAe+OPACYpWeL0wqObRcbAqCMya13uyzqw0=
 github.com/alexcuse/iexcloud/v2 v2.13.1-0.20210106125043-90ce0f2e6164 h1:XYwobTKLN0/rHIP+S4N8yxds87OFIMSM/s1uiNBSL3E=
 github.com/alexcuse/iexcloud/v2 v2.13.1-0.20210106125043-90ce0f2e6164/go.mod h1:ea1t+5Zax/fUbgmNV0ikWku/xcUg0UeKr0Eo2v/nYpQ=
-github.com/alexcuse/yogo/common v0.0.0-20210107010429-058b8a0d1cef h1:vgwVnMNO0a2LLyDkK1ahWNr2j9Bvk4NhN1gjciN23sk=
-github.com/alexcuse/yogo/common v0.0.0-20210107010429-058b8a0d1cef/go.mod h1:BmCW+StYZmQ3agrRmMeTKR+Cd/Wy/6mL2kXh32r/zTg=
+github.com/alexcuse/yogo/common v0.0.0-20210117212647-e85c83a46ab9 h1:PRCn05qYJib2x3RKY3nOfAb5Ar84pOSXX8KQ5RJr+Lg=
+github.com/alexcuse/yogo/common v0.0.0-20210117212647-e85c83a46ab9/go.mod h1:BmCW+StYZmQ3agrRmMeTKR+Cd/Wy/6mL2kXh32r/zTg=
 github.com/andybalholm/brotli v1.0.0 h1:7UCwP93aiSfvWpapti8g88vVVGp2qqtGyePsSuDafo4=
 github.com/andybalholm/brotli v1.0.0/go.mod h1:loMXtMfwqflxFJPmdbJO0a3KNoPuLBgiu3qAvBg8x/Y=
 github.com/beorn7/perks v0.0.0-20180321164747-3a771d992973/go.mod h1:Dwedo/Wpr24TaqPxmxbtue+5NUziq4I4S80YR8gNf3Q=
@@ -38,7 +38,6 @@ github.com/go-chi/chi v4.0.2+incompatible/go.mod h1:eB3wogJHnLi3x/kFX2A+IbTBlXxm
 github.com/go-kit/kit v0.8.0/go.mod h1:xBxKIO96dXMWWy0MnWVtmwkA9/13aqxPnvrjFYMA2as=
 github.com/go-logfmt/logfmt v0.3.0/go.mod h1:Qt1PoO58o5twSAckw1HlFXLmHsOX5/0LbT9GBnD5lWE=
 github.com/go-stack/stack v1.8.0/go.mod h1:v0f6uXyyMGvRgIKkXu+yp6POWl0qKG85gN/melR3HDY=
-github.com/gofiber/fiber v1.14.6 h1:QRUPvPmr8ijQuGo1MgupHBn8E+wW0IKqiOvIZPtV70o=
 github.com/gofiber/fiber/v2 v2.3.2 h1:8ecrfzlfTUsboMybK6TQIfPoObmPR1hEoKU7Ni1pElg=
 github.com/gofiber/fiber/v2 v2.3.2/go.mod h1:f8BRRIMjMdRyt2qmJ/0Sea3j3rwwfufPrh9WNBRiVZ0=
 github.com/gogo/protobuf v1.1.1/go.mod h1:r8qH/GZQm5c6nD/R0oafs1akxWv10x8SbQlK7atdtwQ=

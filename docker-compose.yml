@@ -25,11 +25,12 @@ services:
       context: scanner/.
     depends_on:
       - kafka
+    ports:
+      - "50200:50200"
     restart: always
     command: ["/yogo-scanner"]
     volumes:
       - ./debug-configuration.toml:/configuration.toml
-      - ./debug-signals.toml:/signals.toml
   history:
     build:
       context: history/.
@@ -67,3 +68,5 @@ services:
       - POSTGRES_DB=yogo
       - POSTGRES_USER=yogo
       - POSTGRES_PASSWORD=yogo
+    volumes:
+      - ./postgres/data:/var/lib/postgresql/data

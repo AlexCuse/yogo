@@ -26,5 +26,11 @@ test-quote-enricher:
 	gofmt -l quote-enricher/
 	[ "`gofmt -l quote-enricher/`" = "" ]
 
-test: test-common test-scanner test-quoter test-quote-enricher
+test-history:
+	cd history && $(GO) test ./...
+	cd history && $(GO) vet ./...
+	gofmt -l history/
+	[ "`gofmt -l history/`" = "" ]
+
+test: test-common test-scanner test-quoter test-quote-enricher test-history
 
