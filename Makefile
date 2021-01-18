@@ -14,11 +14,11 @@ test-scanner:
 	gofmt -l scanner/
 	[ "`gofmt -l scanner/`" = "" ]
 
-test-quoter:
-	cd quoter && $(GO) test ./...
-	cd quoter && $(GO) vet ./...
-	gofmt -l quoter/
-	[ "`gofmt -l quoter/`" = "" ]
+test-monitor:
+	cd monitor && $(GO) test ./...
+	cd monitor && $(GO) vet ./...
+	gofmt -l monitor/
+	[ "`gofmt -l monitor/`" = "" ]
 
 test-quote-enricher:
 	cd quote-enricher && $(GO) test ./...
@@ -32,5 +32,5 @@ test-history:
 	gofmt -l history/
 	[ "`gofmt -l history/`" = "" ]
 
-test: test-common test-scanner test-quoter test-quote-enricher test-history
+test: test-common test-scanner test-monitor test-quote-enricher test-history
 
