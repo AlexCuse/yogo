@@ -8,6 +8,7 @@ import (
 	"github.com/alexcuse/yogo/common"
 	iex "github.com/goinvest/iexcloud/v2"
 	"github.com/google/uuid"
+	"time"
 )
 
 func main() {
@@ -61,11 +62,13 @@ func main() {
 			}
 
 			statsPl, err := json.Marshal(struct {
-				Stats  iex.KeyStats
-				Ticker string
+				Stats     iex.KeyStats
+				Ticker    string
+				QuoteDate time.Time
 			}{
-				Stats:  keystats,
-				Ticker: movement.Symbol,
+				Stats:     keystats,
+				Ticker:    movement.Symbol,
+				QuoteDate: time.Time(movement.Date),
 			})
 
 			if err != nil {

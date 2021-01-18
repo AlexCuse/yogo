@@ -113,8 +113,9 @@ func processStats(db *gorm.DB, ctx context.Context, input <-chan *message.Messag
 
 		case msg := <-input:
 			tickerStats := struct {
-				Stats  iex.KeyStats
-				Ticker string
+				Stats     iex.KeyStats
+				Ticker    string
+				QuoteDate time.Time
 			}{}
 
 			if err := json.Unmarshal(msg.Payload, &tickerStats); err != nil {
@@ -122,10 +123,16 @@ func processStats(db *gorm.DB, ctx context.Context, input <-chan *message.Messag
 				continue
 			}
 
+			jsn, err := json.Marshal(tickerStats.Stats)
+
+			if err != nil {
+				log.Errorf("unable to marshal stats")
+			}
+
 			if r := db.WithContext(ctx).Clauses(clause.OnConflict{DoNothing: true}).Create(Stats{
-				Symbol: tickerStats.Ticker,
-				Date:   time.Now(),
-				Data:   datatypes.JSON(msg.Payload),
+				Symbol:    tickerStats.Ticker,
+				QuoteDate: tickerStats.QuoteDate,
+				Data:      datatypes.JSON(jsn),
 			}); r.Error != nil {
 				log.Errorf("unable to persist stats: %s", r.Error.Error())
 				continue
@@ -167,9 +174,9 @@ type Movement struct {
 }
 
 type Stats struct {
-	Symbol string    `gorm:"primaryKey;autoIncrement:false"`
-	Date   time.Time `gorm:"primaryKey;autoIncrement:false"`
-	Data   datatypes.JSON
+	Symbol    string    `gorm:"primaryKey;autoIncrement:false"`
+	QuoteDate time.Time `gorm:"primaryKey;autoIncrement:false"`
+	Data      datatypes.JSON
 }
 
 type Hit struct {
