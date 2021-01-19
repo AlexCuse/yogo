@@ -2,7 +2,7 @@ module github.com/alexcuse/yogo/history
 
 go 1.15
 
-replace github.com/goinvest/iexcloud/v2 => github.com/alexcuse/iexcloud/v2 v2.13.1-0.20210106125043-90ce0f2e6164
+replace github.com/goinvest/iexcloud/v2 => github.com/alexcuse/iexcloud/v2 v2.13.1-0.20210119214143-81db86a8c823
 
 require (
 	github.com/ThreeDotsLabs/watermill v1.1.1

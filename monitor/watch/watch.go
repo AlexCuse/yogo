@@ -138,8 +138,6 @@ func (server Server) Save(ctx *fib.Ctx) error {
 		return handleError(ctx, err)
 	}
 
-	server.quote(w)
-
 	return nil
 }
 
@@ -181,44 +179,52 @@ func handleError(ctx *fib.Ctx, err error) error {
 	return err
 }
 
-func (server Server) readWatchlist() []Watch {
-	watches := make([]Watch, 0)
-
-	for _, w := range server.watchlist {
-		watches = append(watches, w)
-	}
-
-	return watches
-}
-
 func (server Server) background() {
+	//always run on startup
 	server.watch()
 
 	crn := cron.New()
 
-	crn.AddFunc("30 04 * * 1,2,3,4,5", server.watch)
+	//tues-sat 4:30 AM
+	crn.AddFunc("30 04 * * 2,3,4,5,6", server.watch)
 
 	crn.Run()
 }
 
 func (server Server) watch() {
-	for _, t := range server.readWatchlist() {
-		server.quote(t)
-	}
-}
+	previousHolidays, err := server.iex.PreviousHoliday(server.appctx, 1)
 
-func (server Server) quote(t Watch) {
+	if err != nil {
+		server.log.Error(err.Error())
+	}
+
+	lastHoliday := previousHolidays[0]
+
+	server.log.Infof("%s == %s, %t", lastHoliday.Date.String(), iex.Date(time.Now().AddDate(0, 0, -1)).String(), lastHoliday.Date == iex.Date(time.Now().AddDate(0, 0, -1)))
+
+	//if there is an error here let it try to run anyway
+	if err == nil && lastHoliday.Date.String() == iex.Date(time.Now().AddDate(0, 0, -1)).String() {
+		server.log.Infof("Skipping today's watch as %s was a market holiday.", lastHoliday.Date.String())
+		return
+	}
+
 	ctx, cancel := context.WithTimeout(server.appctx, 5*time.Second)
 	defer cancel()
 
-	q, err := server.iex.PreviousDay(ctx, t.Symbol)
+	market, err := server.iex.PreviousDayMarket(ctx)
 
 	if err != nil {
 		server.log.Error(err.Error())
 		return
 	}
 
-	jsn, err := json.Marshal(q)
+	for _, t := range market {
+		server.quote(t)
+	}
+}
+
+func (server Server) quote(t iex.PreviousDay) {
+	jsn, err := json.Marshal(t)
 
 	if err != nil {
 		server.log.Error(err.Error())
