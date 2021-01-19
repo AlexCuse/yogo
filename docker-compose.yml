@@ -5,12 +5,22 @@ services:
       context: monitor/.
     depends_on:
       - kafka
-    ports:
-      - "50100:50100"
     restart: always
     command: ["/yogo-monitor"]
     volumes:
       - ./debug-configuration.toml:/configuration.toml
+  watch:
+    build:
+      context: watch/.
+    depends_on:
+      - kafka
+    ports:
+      - "50100:50100"
+    restart: always
+    command: [ "/yogo-watch" ]
+    volumes:
+      - ./debug-configuration.toml:/configuration.toml
+
   quote-enricher:
     build:
       context: quote-enricher/.

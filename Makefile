@@ -32,7 +32,13 @@ test-history:
 	gofmt -l history/
 	[ "`gofmt -l history/`" = "" ]
 
-test: test-common test-scanner test-monitor test-quote-enricher test-history
+test-watch:
+	cd watch && $(GO) test ./...
+	cd watch && $(GO) vet ./...
+	gofmt -l watch/
+	[ "`gofmt -l watch/`" = "" ]
+
+test: test-common test-scanner test-monitor test-quote-enricher test-history test-watch
 
 PHONY: docker-compose-build
 docker-compose-build:
