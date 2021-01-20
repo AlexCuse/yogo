@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/alexcuse/yogo/common/config"
 	fib "github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	iex "github.com/goinvest/iexcloud/v2"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
@@ -14,7 +15,7 @@ import (
 )
 
 type Watch struct {
-	Symbol string `gorm:"primaryKey;autoIncrement:false"`
+	Symbol string `gorm:"primaryKey;autoIncrement:false" json:"symbol,omitempty"`
 }
 
 type Server struct {
@@ -28,6 +29,7 @@ type Server struct {
 
 func NewServer(cfg config.Configuration, appctx context.Context, db *gorm.DB, log *logrus.Logger) Server {
 	f := fib.New()
+	f.Use(cors.New())
 
 	iecli := iex.NewClient(cfg.IEXToken, iex.WithBaseURL(cfg.IEXBaseURL))
 
@@ -46,13 +48,18 @@ func NewServer(cfg config.Configuration, appctx context.Context, db *gorm.DB, lo
 func (server Server) List(ctx *fib.Ctx) error {
 	watching := make([]Watch, 0)
 
-	_ = server.db.Find(&watching)
+	result := server.db.Find(&watching)
 
-	jsn, _ := json.Marshal(watching)
+	if result.Error != nil {
+		return handleError(ctx, result.Error)
+	}
 
-	ctx.Write(jsn)
+	if result.RowsAffected == 0 {
+		ctx.Status(404)
+		return nil
+	}
 
-	return nil
+	return ctx.JSON(watching)
 }
 
 func (server Server) Save(ctx *fib.Ctx) error {
