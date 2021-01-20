@@ -159,7 +159,7 @@ func (server Server) Run() error {
 		s.background()
 	}(server)
 
-	return server.app.Listen(":50200")
+	return server.app.Listen(fmt.Sprintf(":%d", server.cfg.SignalPort))
 }
 
 func handleError(ctx *fib.Ctx, err error) error {

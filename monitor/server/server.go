@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/ThreeDotsLabs/watermill"
 	"github.com/ThreeDotsLabs/watermill-kafka/v2/pkg/kafka"
 	"github.com/ThreeDotsLabs/watermill/message"
@@ -12,6 +13,9 @@ import (
 	"github.com/google/uuid"
 	"github.com/robfig/cron/v3"
 	"github.com/sirupsen/logrus"
+	"io/ioutil"
+	"net/http"
+	"strings"
 	"time"
 )
 
@@ -73,10 +77,7 @@ func (server Server) watch() {
 		return
 	}
 
-	ctx, cancel := context.WithTimeout(server.appctx, 5*time.Second)
-	defer cancel()
-
-	market, err := server.iex.PreviousDayMarket(ctx)
+	market, err := server.getQuotes()
 
 	if err != nil {
 		server.log.Error(err.Error())
@@ -85,6 +86,52 @@ func (server Server) watch() {
 
 	for _, t := range market {
 		server.quote(t)
+	}
+}
+
+func (server Server) getQuotes() ([]iex.PreviousDay, error) {
+	if strings.ToLower(server.cfg.MonitorSource) == "market" {
+		ctx, cancel := context.WithTimeout(server.appctx, 5*time.Second)
+		defer cancel()
+		return server.iex.PreviousDayMarket(ctx)
+	} else { //"watchlist" is default
+		watchlistUrl := fmt.Sprintf("http://watch:%d/api/watch", server.cfg.WatchPort)
+		resp, err := http.Get(watchlistUrl)
+
+		if err != nil {
+			return nil, err
+		}
+
+		defer resp.Body.Close()
+
+		body, err := ioutil.ReadAll(resp.Body)
+
+		if err != nil {
+			return nil, err
+		}
+
+		wl := make([]struct{ Symbol string }, 0)
+
+		err = json.Unmarshal(body, &wl)
+
+		if err != nil {
+			return nil, err
+		}
+
+		result := make([]iex.PreviousDay, 0)
+
+		for _, w := range wl {
+			ctx, cancel := context.WithTimeout(server.appctx, 500*time.Millisecond)
+			q, err := server.iex.PreviousDay(ctx, w.Symbol)
+
+			if err != nil {
+				server.log.Error(err)
+			}
+
+			result = append(result, q)
+			cancel()
+		}
+		return result, nil
 	}
 }
 

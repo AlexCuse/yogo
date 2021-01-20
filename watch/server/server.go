@@ -98,7 +98,7 @@ func (server Server) Run() error {
 	server.app.Put("api/watch", server.Save)
 	server.app.Delete("api/watch", server.Delete)
 	server.app.Get("api/watch", server.List)
-	return server.app.Listen(":50100")
+	return server.app.Listen(fmt.Sprintf(":%d", server.cfg.WatchPort))
 }
 
 func handleError(ctx *fib.Ctx, err error) error {
