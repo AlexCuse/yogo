@@ -5,6 +5,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strings"
+	"time"
+
 	"github.com/ThreeDotsLabs/watermill"
 	"github.com/ThreeDotsLabs/watermill-kafka/v2/pkg/kafka"
 	"github.com/ThreeDotsLabs/watermill/message"
@@ -16,12 +19,12 @@ import (
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
-	"strings"
-	"time"
+
+	"github.com/gofiber/fiber/v2/middleware/cors"
 )
 
 type Watch struct {
-	Symbol string `gorm:"primaryKey;autoIncrement:false"`
+	Symbol string `gorm:"primaryKey;autoIncrement:false" json:"symbol,omitempty"`
 }
 
 type Server struct {
@@ -37,6 +40,7 @@ type Server struct {
 
 func NewServer(cfg config.Configuration, appctx context.Context, db *gorm.DB, log *logrus.Logger, wml watermill.LoggerAdapter) Server {
 	f := fib.New()
+	f.Use(cors.New())
 
 	pub, err := kafka.NewPublisher(kafka.PublisherConfig{
 		Brokers:               []string{cfg.BrokerURL},
@@ -94,6 +98,23 @@ func (server Server) registerWatch(w Watch) error {
 	return nil
 }
 
+func (server Server) Index(ctx *fib.Ctx) error {
+	watching := make([]Watch, 0)
+
+	result := server.db.Find(&watching)
+
+	if result.Error != nil {
+		return handleError(ctx, result.Error)
+	}
+
+	if result.RowsAffected == 0 {
+		ctx.Status(404)
+		return nil
+	}
+
+	return ctx.JSON(watching)
+}
+
 func (server Server) Save(ctx *fib.Ctx) error {
 	w := Watch{}
 
@@ -143,6 +164,7 @@ func (server Server) Delete(ctx *fib.Ctx) error {
 }
 
 func (server Server) Run() error {
+	server.app.Get("api/watch", server.Index)
 	server.app.Post("api/watch", server.Save)
 	server.app.Put("api/watch", server.Save)
 	server.app.Delete("api/watch", server.Delete)
