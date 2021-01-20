@@ -34,3 +34,10 @@ test-history:
 
 test: test-common test-scanner test-monitor test-quote-enricher test-history
 
+PHONY: docker-compose-build
+docker-compose-build:
+	docker-compose build --build-arg GITHUB_KEY
+
+PHONY: docker-compose-run
+docker-compose-run: docker-compose-build
+	docker-compose up

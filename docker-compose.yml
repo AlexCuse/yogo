@@ -1,4 +1,4 @@
-version: "2"
+version: "2.2"
 services:
   monitor:
     build:
@@ -41,7 +41,16 @@ services:
     command: ["/yogo-history"]
     volumes:
       - ./debug-configuration.toml:/configuration.toml
-
+  dashboard:
+    build:
+      context: dashboard/.
+    depends_on:
+      - monitor
+    ports:
+      - "3000:3000"
+    restart: always
+    environment:
+      - REACT_APP_WATCH_API_URL=http://localhost:50100/
   # infra
   zookeeper:
     image: wurstmeister/zookeeper

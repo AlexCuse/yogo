@@ -1,0 +1,12 @@
+{
+  // set the default formatter for VSC
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+
+  // run ESLint on save
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
+
+  // format the code on save
+  "editor.formatOnSave": true
+}
