@@ -213,9 +213,14 @@ func (server Server) background() {
 
 					if err != nil {
 						server.log.Errorf("problem sending match for %s: (%s)", scan.Name, err.Error())
+						continue
 					}
 
-					server.pub.Publish(server.cfg.HitTopic, message.NewMessage(uuid.New().String(), rslt))
+					err = server.pub.Publish(server.cfg.HitTopic, message.NewMessage(uuid.New().String(), rslt))
+
+					if err != nil {
+						server.log.Errorf("problem sending match for %s: (%s)", scan.Name, err.Error())
+					}
 				}
 			}
 
