@@ -63,19 +63,13 @@ func (server Server) Run() {
 }
 
 func (server Server) watch() {
-	previousHolidays, err := server.iex.PreviousHoliday(server.appctx, 1)
+	lastHoliday, err := server.iex.PreviousHoliday(server.appctx)
 
 	if err != nil {
 		server.log.Error(err.Error())
-	}
-
-	lastHoliday := previousHolidays[0]
-
-	server.log.Infof("%s == %s, %t", lastHoliday.Date.String(), iex.Date(time.Now().AddDate(0, 0, -1)).String(), lastHoliday.Date == iex.Date(time.Now().AddDate(0, 0, -1)))
-
-	//if there is an error here let it try to run anyway
-	if err == nil && lastHoliday.Date.String() == iex.Date(time.Now().AddDate(0, 0, -1)).String() {
-		server.log.Infof("Skipping today's server as %s was a market holiday.", lastHoliday.Date.String())
+		return
+	} else if lastHoliday.Date.String() == iex.Date(time.Now().AddDate(0, 0, -1)).String() {
+		server.log.Infof("Skipping today's monitor run as %s was a market holiday.", lastHoliday.Date.String())
 		return
 	}
 

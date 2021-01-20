@@ -2,7 +2,7 @@ module github.com/alexcuse/yogo/monitor
 
 go 1.15
 
-replace github.com/goinvest/iexcloud/v2 => github.com/alexcuse/iexcloud/v2 v2.13.1-0.20210119214143-81db86a8c823
+replace github.com/goinvest/iexcloud/v2 => github.com/alexcuse/iexcloud/v2 v2.13.1-0.20210120113632-5753dac89be4
 
 require (
 	github.com/ThreeDotsLabs/watermill v1.1.1
@@ -15,6 +15,5 @@ require (
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/sirupsen/logrus v1.7.0
 	github.com/stretchr/testify v1.6.1 // indirect
-	gorm.io/driver/postgres v1.0.6
-	gorm.io/gorm v1.20.11
+	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
 )

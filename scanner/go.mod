@@ -2,7 +2,7 @@ module github.com/alexcuse/yogo/scanner
 
 go 1.15
 
-replace github.com/goinvest/iexcloud/v2 => github.com/alexcuse/iexcloud/v2 v2.13.1-0.20210119214143-81db86a8c823
+replace github.com/goinvest/iexcloud/v2 => github.com/alexcuse/iexcloud/v2 v2.13.1-0.20210120113632-5753dac89be4
 
 require (
 	github.com/ThreeDotsLabs/watermill v1.1.1
