@@ -1,0 +1,11 @@
+{
+  // List of extensions which should be recommended for users of this workspace.
+  "recommendations": [
+    "EditorConfig.EditorConfig",
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "vscode-icons-team.vscode-icons", // Extra suggestion
+    "streetsidesoftware.code-spell-checker", // Extra suggestion
+    "ee92.folderize" // Extra suggestion
+  ]
+}
