@@ -9,7 +9,7 @@ export default class Tradeview extends React.Component {
     new TradingView.widget({
       autosize: true,
       symbol: `${symbol}`,
-      interval: "D",
+      interval: "5",
       timezone: "Etc/UTC",
       theme: "light",
       style: "1",
