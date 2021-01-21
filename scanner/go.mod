@@ -7,13 +7,13 @@ replace github.com/goinvest/iexcloud/v2 => github.com/alexcuse/iexcloud/v2 v2.13
 require (
 	github.com/ThreeDotsLabs/watermill v1.1.1
 	github.com/ThreeDotsLabs/watermill-kafka/v2 v2.2.0
-	github.com/alexcuse/yogo/common v0.0.0-20210120115608-c223b3136664
+	github.com/alexcuse/yogo/common v0.0.0-20210120232603-eef3d00a561a
 	github.com/antonmedv/expr v1.8.9
-	github.com/gofiber/fiber/v2 v2.3.3
 	github.com/goinvest/iexcloud/v2 v2.13.0
 	github.com/google/uuid v1.1.1
+	github.com/klauspost/compress v1.10.7 // indirect
 	github.com/sirupsen/logrus v1.7.0
 	github.com/stretchr/testify v1.6.1
-	gorm.io/driver/postgres v1.0.6
-	gorm.io/gorm v1.20.11
+	golang.org/x/sys v0.0.0-20201210223839-7e3030f88018 // indirect
+	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
 )

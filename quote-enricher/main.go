@@ -58,6 +58,7 @@ func main() {
 
 			if err != nil {
 				log.Errorf("Could not retrieve key stats: %s", err.Error())
+				msg.Nack()
 				continue
 			}
 
@@ -73,12 +74,15 @@ func main() {
 
 			if err != nil {
 				log.Errorf("Could not marshal key stats: %s", err.Error())
+				msg.Nack()
+				continue
 			}
 
 			err = pub.Publish(cfg.StatsTopic, message.NewMessage(uuid.New().String(), statsPl))
 
 			if err != nil {
 				log.Errorf("Could not publish stats: %s", err.Error())
+				msg.Nack()
 				continue
 			}
 
@@ -94,12 +98,15 @@ func main() {
 
 			if err != nil {
 				log.Errorf("Could not marshal enriched payload: %s", err.Error())
+				msg.Nack()
+				continue
 			}
 
 			err = pub.Publish(cfg.ScanTopic, message.NewMessage(msg.UUID, pl))
 
 			if err != nil {
 				log.Errorf("Could not publish enriched payload: %s", err.Error())
+				msg.Nack()
 				continue
 			}
 

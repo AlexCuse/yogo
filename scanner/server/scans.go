@@ -1,4 +1,4 @@
-package signals
+package server
 
 import (
 	"github.com/antonmedv/expr"
@@ -12,14 +12,10 @@ type Target struct {
 	Stats iex.KeyStats
 }
 
-type Signal struct {
-	Name   string `gorm:"primaryKey;autoIncrement:false"`
-	Source string
-}
-
 type Scan struct {
-	Signal
-	check *vm.Program
+	Name   string `json:"name,omitempty"`
+	Source string `json:"source,omitempty"`
+	check  *vm.Program
 }
 
 type hit struct {
@@ -28,7 +24,7 @@ type hit struct {
 	QuoteDate time.Time
 }
 
-func (s Scan) Check(t Target) (bool, error) {
+func (s *Scan) Check(t Target) (bool, error) {
 	res, err := expr.Run(s.check, t)
 
 	if err != nil {
@@ -38,15 +34,14 @@ func (s Scan) Check(t Target) (bool, error) {
 	return res.(bool), err
 }
 
-func NewScan(sig Signal) (*Scan, error) {
-	p, err := expr.Compile(sig.Source, expr.Env(Target{}))
+func (s *Scan) Compile() error {
+	p, err := expr.Compile(s.Source, expr.Env(Target{}))
 
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return &Scan{
-		Signal: sig,
-		check:  p,
-	}, nil
+	s.check = p
+
+	return nil
 }

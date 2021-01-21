@@ -10,3 +10,4 @@ LogLevel = "DEBUG"
 DSN = "host=pg dbname=yogo user=yogo password=yogo"
 SignalPort = 50200
 WatchPort = 50100
+MonitorSource = "MaRkEt"

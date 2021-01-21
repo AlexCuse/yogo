@@ -35,10 +35,19 @@ services:
       context: scanner/.
     depends_on:
       - kafka
+    restart: always
+    command: ["/yogo-scanner"]
+    volumes:
+      - ./debug-configuration.toml:/configuration.toml
+  signals:
+    build:
+      context: signals/.
+    depends_on:
+      - pg
     ports:
       - "50200:50200"
     restart: always
-    command: ["/yogo-scanner"]
+    command: [ "/yogo-signals" ]
     volumes:
       - ./debug-configuration.toml:/configuration.toml
   history:

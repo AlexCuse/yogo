@@ -38,7 +38,13 @@ test-watch:
 	gofmt -l watch/
 	[ "`gofmt -l watch/`" = "" ]
 
-test: test-common test-scanner test-monitor test-quote-enricher test-history test-watch
+test-signals:
+	cd signals && $(GO) test ./...
+	cd signals && $(GO) vet ./...
+	gofmt -l signals/
+	[ "`gofmt -l signals/`" = "" ]
+
+test: test-common test-scanner test-monitor test-quote-enricher test-history test-watch test-signals
 
 PHONY: docker-compose-build
 docker-compose-build:

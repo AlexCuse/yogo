@@ -88,6 +88,7 @@ func processMovements(db *gorm.DB, ctx context.Context, input <-chan *message.Me
 
 			if err := json.Unmarshal(msg.Payload, &movement); err != nil {
 				log.Errorf("unable to unmarshal message: %s", err.Error())
+				msg.Nack()
 				continue
 			}
 
@@ -97,6 +98,7 @@ func processMovements(db *gorm.DB, ctx context.Context, input <-chan *message.Me
 				Data:   datatypes.JSON(msg.Payload),
 			}); r.Error != nil {
 				log.Errorf("unable to persist movement: %s", r.Error.Error())
+				msg.Nack()
 				continue
 			}
 
@@ -120,6 +122,7 @@ func processStats(db *gorm.DB, ctx context.Context, input <-chan *message.Messag
 
 			if err := json.Unmarshal(msg.Payload, &tickerStats); err != nil {
 				log.Errorf("unable to unmarshal message: %s", err.Error())
+				msg.Nack()
 				continue
 			}
 
@@ -135,6 +138,7 @@ func processStats(db *gorm.DB, ctx context.Context, input <-chan *message.Messag
 				Data:      datatypes.JSON(jsn),
 			}); r.Error != nil {
 				log.Errorf("unable to persist stats: %s", r.Error.Error())
+				msg.Nack()
 				continue
 			}
 
@@ -154,11 +158,13 @@ func processHits(db *gorm.DB, ctx context.Context, input <-chan *message.Message
 
 			if err := json.Unmarshal(msg.Payload, &hit); err != nil {
 				log.Errorf("unable to unmarshal message: %s", err.Error())
+				msg.Nack()
 				continue
 			}
 
 			if r := db.WithContext(ctx).Clauses(clause.OnConflict{DoNothing: true}).Create(hit); r.Error != nil {
 				log.Errorf("unable to persist hit: %s", r.Error.Error())
+				msg.Nack()
 				continue
 			}
 

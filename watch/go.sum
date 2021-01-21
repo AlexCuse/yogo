@@ -6,8 +6,8 @@ github.com/alecthomas/template v0.0.0-20160405071501-a0175ee3bccc/go.mod h1:LOuy
 github.com/alecthomas/units v0.0.0-20151022065526-2efee857e7cf/go.mod h1:ybxpYRFXyAe+OPACYpWeL0wqObRcbAqCMya13uyzqw0=
 github.com/alexcuse/iexcloud/v2 v2.13.1-0.20210120113632-5753dac89be4 h1:etg3ZsTs/90k+4F8tIDwVnW4uizHLFvjo8ub6aw12xE=
 github.com/alexcuse/iexcloud/v2 v2.13.1-0.20210120113632-5753dac89be4/go.mod h1:d8T5MFO2A7Hh8CBXsRzO67tLT5RsjDK8cVOub+IRnEo=
-github.com/alexcuse/yogo/common v0.0.0-20210120115608-c223b3136664 h1:QhKzmmdaj2LieGvREdg0VrZFX9JSjtH1fyFsuQ8IKos=
-github.com/alexcuse/yogo/common v0.0.0-20210120115608-c223b3136664/go.mod h1:BmCW+StYZmQ3agrRmMeTKR+Cd/Wy/6mL2kXh32r/zTg=
+github.com/alexcuse/yogo/common v0.0.0-20210120232603-eef3d00a561a h1:J2HD5993gMh36/o8XRtd8hw9EqZ2gzWCwP+K52QeKhY=
+github.com/alexcuse/yogo/common v0.0.0-20210120232603-eef3d00a561a/go.mod h1:BmCW+StYZmQ3agrRmMeTKR+Cd/Wy/6mL2kXh32r/zTg=
 github.com/andybalholm/brotli v1.0.0 h1:7UCwP93aiSfvWpapti8g88vVVGp2qqtGyePsSuDafo4=
 github.com/andybalholm/brotli v1.0.0/go.mod h1:loMXtMfwqflxFJPmdbJO0a3KNoPuLBgiu3qAvBg8x/Y=
 github.com/beorn7/perks v0.0.0-20180321164747-3a771d992973/go.mod h1:Dwedo/Wpr24TaqPxmxbtue+5NUziq4I4S80YR8gNf3Q=
