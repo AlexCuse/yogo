@@ -1,0 +1,4 @@
+
+BrokerURL = "kafka:9092"
+QuoteTopic = "yogo-quotes"
+HitTopic = "yogo-hits"

@@ -8,15 +8,18 @@ import (
 )
 
 type Configuration struct {
-	IEXToken   string
-	IEXBaseURL string
-	BrokerURL  string
-	QuoteTopic string
-	StatsTopic string
-	HitTopic   string
-	ScanTopic  string
-	LogLevel   string
-	DSN        string
+	IEXToken      string
+	IEXBaseURL    string
+	BrokerURL     string
+	QuoteTopic    string
+	StatsTopic    string
+	HitTopic      string
+	ScanTopic     string
+	LogLevel      string
+	DSN           string
+	SignalPort    int
+	WatchPort     int
+	MonitorSource string
 }
 
 func Load(configFile string) (Configuration, error) {

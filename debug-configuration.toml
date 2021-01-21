@@ -6,6 +6,8 @@ QuoteTopic = "yogo-quotes"
 HitTopic = "yogo-hits"
 ScanTopic = "yogo-scans"
 StatsTopic = "yogo-stats"
-HttpURL = ":50100"
 LogLevel = "DEBUG"
 DSN = "host=pg dbname=yogo user=yogo password=yogo"
+SignalPort = 50200
+WatchPort = 50100
+MonitorSource = "MaRkEt"

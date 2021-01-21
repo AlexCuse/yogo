@@ -1,21 +1,21 @@
-package signals_test
+package server_test
 
 import (
-	"github.com/alexcuse/yogo/scanner/signals"
+	"github.com/alexcuse/yogo/scanner/server"
 	iex "github.com/goinvest/iexcloud/v2"
 	"github.com/stretchr/testify/require"
 	"testing"
 )
 
 func TestCheck(t *testing.T) {
-	sig := signals.Signal{
+	scan := server.Scan{
 		Name:   "Test",
 		Source: "Quote.Close > .2",
 	}
 
-	scan, _ := signals.NewScan(sig)
+	require.NoError(t, scan.Compile())
 
-	res, err := scan.Check(signals.Target{
+	res, err := scan.Check(server.Target{
 		Quote: iex.PreviousDay{
 			Close: .6,
 		},
@@ -25,7 +25,7 @@ func TestCheck(t *testing.T) {
 	require.True(t, res)
 	require.Nil(t, err)
 
-	res, err = scan.Check(signals.Target{
+	res, err = scan.Check(server.Target{
 		Quote: iex.PreviousDay{
 			Close: .1,
 		},
