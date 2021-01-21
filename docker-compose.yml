@@ -13,14 +13,13 @@ services:
     build:
       context: watch/.
     depends_on:
-      - kafka
+      - pg
     ports:
       - "50100:50100"
     restart: always
     command: [ "/yogo-watch" ]
     volumes:
       - ./debug-configuration.toml:/configuration.toml
-
   quote-enricher:
     build:
       context: quote-enricher/.
@@ -64,12 +63,14 @@ services:
     build:
       context: dashboard/.
     depends_on:
-      - monitor
+      - watch
+      - signals
     ports:
       - "3000:3000"
     restart: always
     environment:
       - REACT_APP_WATCH_API_URL=http://localhost:50100/
+      - REACT_APP_SIGNAL_API_URL=http://localhost:50200/
   # infra
   zookeeper:
     image: wurstmeister/zookeeper

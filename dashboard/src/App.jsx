@@ -3,7 +3,7 @@ import "./App.css";
 import Container from "@material-ui/core/Container";
 import Typography from "@material-ui/core/Typography";
 import Box from "@material-ui/core/Box";
-import Watchlist from "./watch/Watchlist";
+import Signallist from "./signals/Signallist";
 
 function App() {
   return (
@@ -14,7 +14,7 @@ function App() {
         </Typography>
       </Box>
 
-      <Watchlist />
+      <Signallist />
     </Container>
   );
 }
