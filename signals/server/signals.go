@@ -9,3 +9,8 @@ type SignalWithHitCount struct {
 	Signal
 	Count int `json:"count,omitempty"`
 }
+
+type SignalDetail struct {
+	Signal
+	Active []string `json:"active"`
+}

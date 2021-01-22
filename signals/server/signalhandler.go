@@ -13,6 +13,7 @@ type SignalHandler interface {
 	Delete(ctx *fib.Ctx) error
 	Save(ctx *fib.Ctx) error
 	Current(ctx *fib.Ctx) error
+	CurrentByName(ctx *fib.Ctx) error
 }
 
 type signalHandler struct {
@@ -106,4 +107,46 @@ func (h signalHandler) Current(ctx *fib.Ctx) error {
 	}
 
 	return ctx.JSON(signals)
+}
+
+func (h signalHandler) CurrentByName(ctx *fib.Ctx) error {
+	name := ctx.Query("name")
+
+	res := Signal{}
+
+	h.log.Debugf("name: %s", name)
+
+	result := h.db.Select("signals.*, hits.symbol").Table(
+		"hits",
+	).Joins(
+		"left join signals on hits.rule_name = signals.name",
+	).Where(
+		"hits.quote_date = (?) and signals.name = ?",
+		h.db.Select("Max(quote_date)").Table("hits"),
+		name,
+	).Scan(&res)
+
+	if result.Error != nil {
+		return h.handleError(ctx, result.Error)
+	}
+
+	h.log.Debugf("res: %+v", res)
+
+	tickers := make([]string, 0)
+
+	tickerResult := h.db.Select("distinct symbol").Table(
+		"hits",
+	).Where(
+		"quote_date = (?) and rule_name = ?",
+		h.db.Select("Max(quote_date)").Table("hits"),
+		name,
+	).Scan(&tickers)
+
+	if tickerResult.Error != nil {
+		return h.handleError(ctx, result.Error)
+	}
+
+	h.log.Debugf("res: %+v", tickers)
+
+	return ctx.JSON(SignalDetail{res, tickers})
 }

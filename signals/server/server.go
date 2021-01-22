@@ -43,7 +43,7 @@ func (server Server) Run() error {
 	server.app.Delete("api/signal", server.sig.Delete)
 	server.app.Get("api/signal", server.sig.List)
 	server.app.Get("api/signal/current", server.sig.Current)
-
+	server.app.Get("api/signal/currentbyname", server.sig.CurrentByName)
 	return server.app.Listen(fmt.Sprintf(":%d", server.cfg.SignalPort))
 }
 
