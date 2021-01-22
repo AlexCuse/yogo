@@ -55,9 +55,6 @@ func NewServer(cfg config.Configuration, appctx context.Context, log *logrus.Log
 	return server
 }
 func (server Server) Run() {
-	//always run on startup
-	server.watch()
-
 	crn := cron.New()
 
 	//tues-sat 4:30 AM
