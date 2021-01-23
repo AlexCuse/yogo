@@ -27,8 +27,6 @@ export default class CurrentDetail extends React.Component {
         this.setState({
           signal: data,
         });
-
-        console.log(this.state);
       });
   }
 

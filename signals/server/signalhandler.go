@@ -114,8 +114,6 @@ func (h signalHandler) CurrentByName(ctx *fib.Ctx) error {
 
 	res := Signal{}
 
-	h.log.Debugf("name: %s", name)
-
 	result := h.db.Select("signals.*, hits.symbol").Table(
 		"hits",
 	).Joins(
@@ -130,8 +128,6 @@ func (h signalHandler) CurrentByName(ctx *fib.Ctx) error {
 		return h.handleError(ctx, result.Error)
 	}
 
-	h.log.Debugf("res: %+v", res)
-
 	tickers := make([]string, 0)
 
 	tickerResult := h.db.Select("distinct symbol").Table(
@@ -145,8 +141,6 @@ func (h signalHandler) CurrentByName(ctx *fib.Ctx) error {
 	if tickerResult.Error != nil {
 		return h.handleError(ctx, result.Error)
 	}
-
-	h.log.Debugf("res: %+v", tickers)
 
 	return ctx.JSON(SignalDetail{res, tickers})
 }
