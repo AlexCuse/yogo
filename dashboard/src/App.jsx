@@ -8,7 +8,8 @@ import { Link as RouterLink, Route, Switch } from "react-router-dom";
 import Link from "@material-ui/core/Link";
 import List from "@material-ui/core/List";
 import Watchlist from "./watch/Watchlist";
-import Signallist from "./signals/Signallist";
+import Current from "./signals/Current";
+import CurrentDetail from "./signals/CurrentDetail";
 
 function App() {
   return (
@@ -32,8 +33,13 @@ function App() {
           </Typography>
         </List>
         <Switch>
-          <Route path="/watch" component={Watchlist} />
-          <Route path="/signals" component={Signallist} />
+          <Route exact path="/watch" component={Watchlist} />
+          <Route
+            exact
+            path="/signals/:name/detail"
+            component={CurrentDetail}
+          />
+          <Route exact path="/signals" component={Current} />
         </Switch>
       </Router>
     </Container>

@@ -1,12 +1,13 @@
 import React from "react";
 import Card from "@material-ui/core/Card";
-import CardActions from "@material-ui/core/CardActions";
 import CardContent from "@material-ui/core/CardContent";
-import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
+import { Link as RouterLink } from "react-router-dom";
+import Link from "@material-ui/core/Link";
 import PropTypes from "prop-types";
 
-export default function Signal({ signal }) {
+export default function Summary({ signal }) {
+  const sigpath = `/signals/${signal.name}/detail`;
   return (
     <Card>
       <CardContent>
@@ -19,14 +20,18 @@ export default function Signal({ signal }) {
         <Typography>
           source: <i>{signal.source}</i>
         </Typography>
+        <Link component={RouterLink} to={sigpath}>
+          Details
+        </Link>
       </CardContent>
-      <CardActions>
-        <Button size="small">Learn More</Button>
-      </CardActions>
     </Card>
   );
 }
 
-Signal.propTypes = {
-  signal: PropTypes.shape({ name: PropTypes.string.isRequired, source: PropTypes.string.isRequired, count: PropTypes.number.isRequired }).isRequired,
+Summary.propTypes = {
+  signal: PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    source: PropTypes.string.isRequired,
+    count: PropTypes.number.isRequired,
+  }).isRequired,
 };

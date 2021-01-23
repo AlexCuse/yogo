@@ -1,5 +1,5 @@
 import React from "react";
-import Signal from "./Signal";
+import Summary from "./Summary";
 
 export default class extends React.Component {
   constructor(props) {
@@ -32,7 +32,7 @@ export default class extends React.Component {
     return (
       <div>
         {signals.map((v) => (
-          <Signal signal={v} key={v.name} />
+          <Summary signal={v} key={v.name} />
         ))}
       </div>
     );

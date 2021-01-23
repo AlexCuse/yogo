@@ -44,7 +44,10 @@ test-signals:
 	gofmt -l signals/
 	[ "`gofmt -l signals/`" = "" ]
 
-test: test-common test-scanner test-monitor test-quote-enricher test-history test-watch test-signals
+test-dashboard:
+	cd dashboard && npm run-script build
+
+test: test-common test-scanner test-monitor test-quote-enricher test-history test-watch test-signals test-dashboard
 
 PHONY: docker-compose-build
 docker-compose-build:
