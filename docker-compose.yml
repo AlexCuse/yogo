@@ -5,6 +5,8 @@ services:
       context: monitor/.
     depends_on:
       - kafka
+    ports:
+      - "50000:50000"
     restart: always
     command: ["/yogo-monitor"]
     volumes:

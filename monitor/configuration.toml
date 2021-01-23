@@ -3,3 +3,6 @@ IEXToken = ""
 IEXBaseURL = "https://cloud.iexapis.com/v1"
 BrokerURL = "kafka:9092"
 QuoteTopic = "yogo-quotes"
+MonitorSource = ""
+MonitorPort = 50000
+MonitorCronSchedule = "30 04 * * 2,3,4,5,6"

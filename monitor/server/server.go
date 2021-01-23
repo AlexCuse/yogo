@@ -9,6 +9,7 @@ import (
 	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/alexcuse/yogo/common/config"
 	fib "github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	iex "github.com/goinvest/iexcloud/v2"
 	"github.com/google/uuid"
 	"github.com/robfig/cron/v3"
@@ -54,13 +55,25 @@ func NewServer(cfg config.Configuration, appctx context.Context, log *logrus.Log
 
 	return server
 }
-func (server Server) Run() {
+func (server Server) Run() error {
 	crn := cron.New()
 
-	//tues-sat 4:30 AM
-	crn.AddFunc("30 04 * * 2,3,4,5,6", server.watch)
+	crn.AddFunc(server.cfg.MonitorCronSchedule, server.watch)
 
-	crn.Run()
+	go crn.Run()
+
+	f := fib.New()
+	f.Use(cors.New())
+
+	f.Post("/api/start", server.webStartWatch)
+
+	return f.Listen(fmt.Sprintf(":%d", server.cfg.MonitorPort))
+}
+
+func(server Server) webStartWatch(ctx *fib.Ctx) error {
+	go server.watch()
+
+	return ctx.SendString("OK")
 }
 
 func (server Server) watch() {
