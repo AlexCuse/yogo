@@ -41,9 +41,9 @@ func (server Server) Run() error {
 	server.app.Post("api/signal", server.sig.Save)
 	server.app.Put("api/signal", server.sig.Save)
 	server.app.Delete("api/signal", server.sig.Delete)
-	server.app.Get("api/signal", server.sig.List)
-	server.app.Get("api/signal/current", server.sig.Current)
-	server.app.Get("api/signal/currentbyname", server.sig.CurrentByName)
+	server.app.Get("api/signals", server.sig.List)
+	server.app.Get("api/signals/current", server.sig.Current)
+	server.app.Get("api/signal/:name/current", server.sig.CurrentByName)
 	return server.app.Listen(fmt.Sprintf(":%d", server.cfg.SignalPort))
 }
 

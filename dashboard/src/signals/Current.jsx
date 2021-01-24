@@ -9,7 +9,7 @@ export default class extends React.Component {
     };
 
     this.watchApiUrl = new URL(
-      "api/signal/current",
+      "api/signals/current",
       process.env.REACT_APP_SIGNAL_API_URL
     );
 
