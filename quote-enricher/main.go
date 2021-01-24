@@ -8,11 +8,16 @@ import (
 	"github.com/alexcuse/yogo/common"
 	iex "github.com/goinvest/iexcloud/v2"
 	"github.com/google/uuid"
+	"gorm.io/datatypes"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 	"time"
 )
 
 func main() {
 	cfg, log, wml := common.Bootstrap("configuration.toml")
+
+	db, err := gorm.Open(postgres.Open(cfg.DSN), &gorm.Config{})
 
 	sub, err := kafka.NewSubscriber(kafka.SubscriberConfig{
 		Brokers:               []string{cfg.BrokerURL},
@@ -52,9 +57,34 @@ func main() {
 				continue
 			}
 
-			iexClient := iex.NewClient(cfg.IEXToken, iex.WithBaseURL(cfg.IEXBaseURL))
+			var keystats iex.KeyStats
 
-			keystats, err := iexClient.KeyStats(context.Background(), movement.Symbol)
+			dbStats := struct {
+				Symbol    string    `gorm:"primaryKey;autoIncrement:false"`
+				QuoteDate time.Time `gorm:"primaryKey;autoIncrement:false;type:date"`
+				Data      datatypes.JSON
+			}{}
+
+			result := db.Select("stats.*").Table(
+				"stats",
+			).Where(
+				"symbol = ? and stats.quote_date = ?",
+				movement.Symbol,
+				time.Time(movement.Date),
+			).Scan(&dbStats)
+
+			if result.Error != nil || result.RowsAffected == 0 {
+				if result.Error != nil {
+					log.Errorf("failed to query stats from DB: %s", result.Error.Error())
+				}
+				log.Debugf("fetching stats from IEX: %s / %s", movement.Symbol, movement.Date.String())
+				iexClient := iex.NewClient(cfg.IEXToken, iex.WithBaseURL(cfg.IEXBaseURL))
+
+				keystats, err = iexClient.KeyStats(context.Background(), movement.Symbol)
+			} else {
+				log.Debugf("got %s stats from DB: %s", movement.Symbol, movement.Date.String())
+				err = json.Unmarshal(dbStats.Data, &keystats)
+			}
 
 			if err != nil {
 				log.Errorf("Could not retrieve key stats: %s", err.Error())
