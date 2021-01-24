@@ -65,7 +65,7 @@ func (server Server) Run() error {
 
 func (server Server) readScans() ([]*Scan, error) {
 	if server.scans == nil || server.scansInvalid.Before(time.Now()) {
-		resp, err := http.Get(fmt.Sprintf("http://signals:%d/api/signal", server.cfg.SignalPort))
+		resp, err := http.Get(fmt.Sprintf("http://signals:%d/api/signals", server.cfg.SignalPort))
 		if err != nil {
 			return nil, err
 		}

@@ -13,7 +13,7 @@ export default class CurrentDetail extends React.Component {
     const { name } = props.match.params;
 
     this.signalUrl = new URL(
-      `api/signal/currentbyname?name=${name}`,
+      `api/signal/${name}/current`,
       process.env.REACT_APP_SIGNAL_API_URL
     );
 

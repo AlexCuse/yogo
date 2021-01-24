@@ -105,7 +105,7 @@ func (h signalHandler) Current(ctx *fib.Ctx) error {
 }
 
 func (h signalHandler) CurrentByName(ctx *fib.Ctx) error {
-	name := ctx.Query("name")
+	name := ctx.Params("name")
 
 	res := Signal{}
 
