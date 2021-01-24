@@ -33,11 +33,6 @@ func (h signalHandler) List(ctx *fib.Ctx) error {
 		return h.handleError(ctx, result.Error)
 	}
 
-	if result.RowsAffected == 0 {
-		ctx.Status(404)
-		return nil
-	}
-
 	return ctx.JSON(signals)
 }
 

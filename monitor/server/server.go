@@ -70,7 +70,7 @@ func (server Server) Run() error {
 	return f.Listen(fmt.Sprintf(":%d", server.cfg.MonitorPort))
 }
 
-func(server Server) webStartWatch(ctx *fib.Ctx) error {
+func (server Server) webStartWatch(ctx *fib.Ctx) error {
 	go server.watch()
 
 	return ctx.SendString("OK")
