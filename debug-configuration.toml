@@ -10,4 +10,6 @@ LogLevel = "DEBUG"
 DSN = "host=pg dbname=yogo user=yogo password=yogo"
 SignalPort = 50200
 WatchPort = 50100
-MonitorSource = "MaRkEt"
+MonitorSource = "markeT"
+MonitorPort = 50000
+MonitorCronPattern = "30 04 * * 2,3,4,5,6"
