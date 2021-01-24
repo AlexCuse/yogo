@@ -10,4 +10,7 @@ require (
 	github.com/alexcuse/yogo/common v0.0.0-20210123182901-5eac3e03f09d
 	github.com/goinvest/iexcloud/v2 v2.13.0
 	github.com/google/uuid v1.1.1
+	gorm.io/datatypes v1.0.0
+	gorm.io/driver/postgres v1.0.6
+	gorm.io/gorm v1.20.11
 )
