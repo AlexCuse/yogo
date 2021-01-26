@@ -7,7 +7,7 @@ replace github.com/goinvest/iexcloud/v2 => github.com/alexcuse/iexcloud/v2 v2.13
 require (
 	github.com/ThreeDotsLabs/watermill v1.1.1
 	github.com/ThreeDotsLabs/watermill-kafka/v2 v2.2.0
-	github.com/alexcuse/yogo/common v0.0.0-20210123182901-5eac3e03f09d
+	github.com/alexcuse/yogo/common v0.0.0-20210126025203-16d51522ef9a
 	github.com/gofiber/fiber/v2 v2.3.3
 	github.com/goinvest/iexcloud/v2 v2.13.0
 	github.com/google/uuid v1.1.1
@@ -15,7 +15,6 @@ require (
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/sirupsen/logrus v1.7.0
 	github.com/stretchr/testify v1.6.1 // indirect
-	gorm.io/datatypes v1.0.0
 	gorm.io/driver/postgres v1.0.6
 	gorm.io/gorm v1.20.11
 )

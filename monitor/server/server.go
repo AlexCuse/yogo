@@ -8,13 +8,13 @@ import (
 	"github.com/ThreeDotsLabs/watermill-kafka/v2/pkg/kafka"
 	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/alexcuse/yogo/common/config"
+	"github.com/alexcuse/yogo/common/contracts/db"
 	fib "github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	iex "github.com/goinvest/iexcloud/v2"
 	"github.com/google/uuid"
 	"github.com/robfig/cron/v3"
 	"github.com/sirupsen/logrus"
-	"gorm.io/datatypes"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -47,18 +47,18 @@ func NewServer(cfg config.Configuration, appctx context.Context, log *logrus.Log
 		panic(err)
 	}
 
-	db, err := gorm.Open(postgres.Open(cfg.DSN), &gorm.Config{})
+	dbase, err := gorm.Open(postgres.Open(cfg.DSN), &gorm.Config{})
 	if err != nil {
 		panic(err)
 	}
 
-	db.AutoMigrate(&Asset{})
+	dbase.AutoMigrate(db.Asset{})
 
 	iecli := iex.NewClient(cfg.IEXToken, iex.WithBaseURL(cfg.IEXBaseURL))
 
 	server := Server{
 		log:    log,
-		db:     db,
+		db:     dbase,
 		appctx: appctx,
 		app:    f,
 		pub:    pub,
@@ -120,7 +120,7 @@ func (server Server) getQuotes() ([]iex.PreviousDay, error) {
 
 		if err == nil {
 			for _, q := range res {
-				if r := server.db.WithContext(server.appctx).Clauses(clause.OnConflict{DoNothing: true}).Create(Asset{Symbol: q.Symbol}); r.Error != nil {
+				if r := server.db.WithContext(server.appctx).Clauses(clause.OnConflict{DoNothing: true}).Create(db.Asset{Symbol: q.Symbol}); r.Error != nil {
 					server.log.Errorf("unable to persist asset: %s", r.Error.Error())
 				}
 			}
@@ -172,11 +172,7 @@ func (server Server) getQuotes() ([]iex.PreviousDay, error) {
 	results := make([]iex.PreviousDay, 0)
 
 	for _, w := range wl {
-		dbMovement := struct {
-			Symbol string    `gorm:"primaryKey;autoIncrement:false"`
-			Date   time.Time `gorm:"primaryKey;autoIncrement:false;type:date"`
-			Data   datatypes.JSON
-		}{}
+		dbMovement := db.Movement{}
 
 		result := server.db.Select("*").Table(
 			"movements",
@@ -187,31 +183,34 @@ func (server Server) getQuotes() ([]iex.PreviousDay, error) {
 		).Scan(&dbMovement)
 
 		var pd iex.PreviousDay
-		var err error = nil
+		var found = false
 
-		if result.RowsAffected == 0 || result.Error != nil {
-			if result.Error != nil {
-				server.log.Errorf("failed to look up movement from database for %s / %s", w.Symbol, lastTradeDate.Date.String())
+		if result.RowsAffected == 1 && result.Error == nil {
+			server.log.Debugf("got %s movement from DB: %s", w.Symbol, lastTradeDate.Date.String())
+			err = json.Unmarshal(dbMovement.Data, &pd)
+
+			if err != nil {
+				server.log.Errorf("Unable to unmarshal json for %s(%s): %s (%s)", w.Symbol, lastTradeDate.Date.String(), err.Error(), string(dbMovement.Data))
+			} else {
+				found = true
 			}
+		}
+
+		if !found {
 			server.log.Debugf("fetching PreviousDay from IEX: %s", w.Symbol)
 			ctx, cancel := context.WithTimeout(server.appctx, 500*time.Millisecond)
 			pd, err = server.iex.PreviousDay(ctx, w.Symbol)
 
 			if err != nil {
 				server.log.Error(err)
+			} else {
+				found = true
 			}
 
 			cancel()
-		} else {
-			server.log.Debugf("got %s movement from DB: %s", w.Symbol, lastTradeDate.Date.String())
-			err = json.Unmarshal(dbMovement.Data, &pd)
-
-			if err != nil {
-				server.log.Errorf("Unable to unmarshal json for %s(%s): %s (%s)", w.Symbol, lastTradeDate.Date.String(), err.Error(), string(dbMovement.Data))
-			}
 		}
 
-		if pd.Symbol != "" {
+		if found {
 			results = append(results, pd)
 		}
 	}
@@ -233,8 +232,4 @@ func (server Server) quote(t iex.PreviousDay) {
 	if err != nil {
 		server.log.Error(err.Error())
 	}
-}
-
-type Asset struct {
-	Symbol string `gorm:"primaryKey;autoIncrement:false" json:"symbol,omitempty"`
 }

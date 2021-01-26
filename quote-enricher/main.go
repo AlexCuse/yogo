@@ -6,9 +6,9 @@ import (
 	"github.com/ThreeDotsLabs/watermill-kafka/v2/pkg/kafka"
 	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/alexcuse/yogo/common"
+	"github.com/alexcuse/yogo/common/contracts/db"
 	iex "github.com/goinvest/iexcloud/v2"
 	"github.com/google/uuid"
-	"gorm.io/datatypes"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"time"
@@ -17,7 +17,7 @@ import (
 func main() {
 	cfg, log, wml := common.Bootstrap("configuration.toml")
 
-	db, err := gorm.Open(postgres.Open(cfg.DSN), &gorm.Config{})
+	dbase, err := gorm.Open(postgres.Open(cfg.DSN), &gorm.Config{})
 
 	sub, err := kafka.NewSubscriber(kafka.SubscriberConfig{
 		Brokers:               []string{cfg.BrokerURL},
@@ -57,15 +57,9 @@ func main() {
 				continue
 			}
 
-			var keystats iex.KeyStats
+			dbStats := db.Stats{}
 
-			dbStats := struct {
-				Symbol    string    `gorm:"primaryKey;autoIncrement:false"`
-				QuoteDate time.Time `gorm:"primaryKey;autoIncrement:false;type:date"`
-				Data      datatypes.JSON
-			}{}
-
-			result := db.Select("stats.*").Table(
+			result := dbase.Select("stats.*").Table(
 				"stats",
 			).Where(
 				"symbol = ? and stats.quote_date = ?",
@@ -73,21 +67,39 @@ func main() {
 				time.Time(movement.Date),
 			).Scan(&dbStats)
 
-			if result.Error != nil || result.RowsAffected == 0 {
-				if result.Error != nil {
-					log.Errorf("failed to query stats from DB: %s", result.Error.Error())
+			keystats := iex.KeyStats{}
+			found := false
+
+			if result.RowsAffected == 1 && result.Error == nil {
+				log.Debugf("got %s stats from DB: %s", movement.Symbol, movement.Date.String())
+				err = json.Unmarshal(dbStats.Data, &keystats)
+
+				if err != nil {
+					log.Errorf("failed to unmarshal %s (%s) stats: %s", movement.Symbol, movement.Date.String(), err.Error())
+				} else {
+					found = true
 				}
+			}
+
+			if !found {
 				log.Debugf("fetching stats from IEX: %s / %s", movement.Symbol, movement.Date.String())
 				iexClient := iex.NewClient(cfg.IEXToken, iex.WithBaseURL(cfg.IEXBaseURL))
 
 				keystats, err = iexClient.KeyStats(context.Background(), movement.Symbol)
-			} else {
-				log.Debugf("got %s stats from DB: %s", movement.Symbol, movement.Date.String())
-				err = json.Unmarshal(dbStats.Data, &keystats)
+
+				if err != nil {
+					log.Errorf("failed to get %s (%s) stats from IEX: %s", movement.Symbol, movement.Date.String(), err.Error())
+				} else {
+					found = true
+				}
 			}
 
-			if err != nil {
-				log.Errorf("Could not retrieve key stats: %s", err.Error())
+			if !found {
+				errString := "no error"
+				if err != nil {
+					errString = err.Error()
+				}
+				log.Errorf("Could not retrieve key stats: %s", errString)
 				msg.Nack()
 				continue
 			}

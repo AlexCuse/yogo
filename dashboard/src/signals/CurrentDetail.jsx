@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import Summary from "./Summary";
-import Chart from "../tradingview/Chart";
+import Hit from "./Hit";
 
 export default class CurrentDetail extends React.Component {
   constructor(props) {
@@ -24,6 +24,7 @@ export default class CurrentDetail extends React.Component {
     fetch(this.signalUrl)
       .then((response) => response.json())
       .then((data) => {
+        console.log(data);
         this.setState({
           signal: data,
         });
@@ -44,7 +45,7 @@ export default class CurrentDetail extends React.Component {
         </div>
         <div>
           {signal.active.map((v) => (
-            <Chart symbol={v} key={v} />
+            <Hit hit={v} key={v.symbol} />
           ))}
         </div>
       </div>

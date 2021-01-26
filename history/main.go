@@ -9,6 +9,7 @@ import (
 
 	"github.com/ThreeDotsLabs/watermill-kafka/v2/pkg/kafka"
 	"github.com/alexcuse/yogo/common"
+	"github.com/alexcuse/yogo/common/contracts/db"
 	iex "github.com/goinvest/iexcloud/v2"
 	"gorm.io/datatypes"
 	"gorm.io/driver/postgres"
@@ -28,22 +29,22 @@ func main() {
 		panic(err)
 	}
 
-	db, err := gorm.Open(postgres.Open(cfg.DSN), &gorm.Config{})
+	dbase, err := gorm.Open(postgres.Open(cfg.DSN), &gorm.Config{})
 	if err != nil {
 		panic(err)
 	}
 
-	err = db.AutoMigrate(&Movement{})
+	err = dbase.AutoMigrate(&db.Movement{})
 	if err != nil {
 		panic(err)
 	}
 
-	err = db.AutoMigrate(&Stats{})
+	err = dbase.AutoMigrate(&db.Stats{})
 	if err != nil {
 		panic(err)
 	}
 
-	err = db.AutoMigrate(&Hit{})
+	err = dbase.AutoMigrate(&db.Hit{})
 	if err != nil {
 		panic(err)
 	}
@@ -55,21 +56,21 @@ func main() {
 	}
 
 	//add waitgroup etc
-	go processMovements(db, ctx, movements, log)
+	go processMovements(dbase, ctx, movements, log)
 
 	stats, err := sub.Subscribe(ctx, cfg.StatsTopic)
 	if err != nil {
 		panic(err)
 	}
 
-	go processStats(db, ctx, stats, log)
+	go processStats(dbase, ctx, stats, log)
 
 	hits, err := sub.Subscribe(ctx, cfg.HitTopic)
 	if err != nil {
 		panic(err)
 	}
 
-	go processHits(db, ctx, hits, log)
+	go processHits(dbase, ctx, hits, log)
 
 	select {
 	case <-ctx.Done():
@@ -77,7 +78,7 @@ func main() {
 	}
 }
 
-func processMovements(db *gorm.DB, ctx context.Context, input <-chan *message.Message, log *logrus.Logger) {
+func processMovements(dbase *gorm.DB, ctx context.Context, input <-chan *message.Message, log *logrus.Logger) {
 	for {
 		select {
 		case <-ctx.Done():
@@ -92,7 +93,7 @@ func processMovements(db *gorm.DB, ctx context.Context, input <-chan *message.Me
 				continue
 			}
 
-			if r := db.WithContext(ctx).Clauses(clause.OnConflict{DoNothing: true}).Create(Movement{
+			if r := dbase.WithContext(ctx).Clauses(clause.OnConflict{DoNothing: true}).Create(db.Movement{
 				Symbol: movement.Symbol,
 				Date:   time.Time(movement.Date),
 				Data:   datatypes.JSON(msg.Payload),
@@ -107,7 +108,7 @@ func processMovements(db *gorm.DB, ctx context.Context, input <-chan *message.Me
 	}
 }
 
-func processStats(db *gorm.DB, ctx context.Context, input <-chan *message.Message, log *logrus.Logger) {
+func processStats(dbase *gorm.DB, ctx context.Context, input <-chan *message.Message, log *logrus.Logger) {
 	for {
 		select {
 		case <-ctx.Done():
@@ -132,7 +133,7 @@ func processStats(db *gorm.DB, ctx context.Context, input <-chan *message.Messag
 				log.Errorf("unable to marshal stats")
 			}
 
-			if r := db.WithContext(ctx).Clauses(clause.OnConflict{DoNothing: true}).Create(Stats{
+			if r := dbase.WithContext(ctx).Clauses(clause.OnConflict{DoNothing: true}).Create(db.Stats{
 				Symbol:    tickerStats.Ticker,
 				QuoteDate: tickerStats.QuoteDate,
 				Data:      datatypes.JSON(jsn),
@@ -147,14 +148,14 @@ func processStats(db *gorm.DB, ctx context.Context, input <-chan *message.Messag
 	}
 }
 
-func processHits(db *gorm.DB, ctx context.Context, input <-chan *message.Message, log *logrus.Logger) {
+func processHits(dbase *gorm.DB, ctx context.Context, input <-chan *message.Message, log *logrus.Logger) {
 	for {
 		select {
 		case <-ctx.Done():
 			return
 
 		case msg := <-input:
-			hit := Hit{}
+			hit := db.Hit{}
 
 			if err := json.Unmarshal(msg.Payload, &hit); err != nil {
 				log.Errorf("unable to unmarshal message: %s", err.Error())
@@ -162,7 +163,7 @@ func processHits(db *gorm.DB, ctx context.Context, input <-chan *message.Message
 				continue
 			}
 
-			if r := db.WithContext(ctx).Clauses(clause.OnConflict{DoNothing: true}).Create(hit); r.Error != nil {
+			if r := dbase.WithContext(ctx).Clauses(clause.OnConflict{DoNothing: true}).Create(hit); r.Error != nil {
 				log.Errorf("unable to persist hit: %s", r.Error.Error())
 				msg.Nack()
 				continue
@@ -171,22 +172,4 @@ func processHits(db *gorm.DB, ctx context.Context, input <-chan *message.Message
 			msg.Ack()
 		}
 	}
-}
-
-type Movement struct {
-	Symbol string    `gorm:"primaryKey;autoIncrement:false"`
-	Date   time.Time `gorm:"primaryKey;autoIncrement:false;type:date"`
-	Data   datatypes.JSON
-}
-
-type Stats struct {
-	Symbol    string    `gorm:"primaryKey;autoIncrement:false"`
-	QuoteDate time.Time `gorm:"primaryKey;autoIncrement:false;type:date"`
-	Data      datatypes.JSON
-}
-
-type Hit struct {
-	RuleName  string    `gorm:"primaryKey;autoIncrement:false"`
-	Symbol    string    `gorm:"primaryKey;autoIncrement:false"`
-	QuoteDate time.Time `gorm:"primaryKey;autoIncrement:false;type:date"`
 }
