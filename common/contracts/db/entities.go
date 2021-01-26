@@ -26,4 +26,3 @@ type Hit struct {
 	Symbol    string    `gorm:"primaryKey;autoIncrement:false"`
 	QuoteDate time.Time `gorm:"primaryKey;autoIncrement:false;type:date"`
 }
-

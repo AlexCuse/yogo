@@ -7,7 +7,7 @@ replace github.com/goinvest/iexcloud/v2 => github.com/alexcuse/iexcloud/v2 v2.13
 require (
 	github.com/ThreeDotsLabs/watermill v1.1.1
 	github.com/ThreeDotsLabs/watermill-kafka/v2 v2.2.0
-	github.com/alexcuse/yogo/common v0.0.0-20210123182901-5eac3e03f09d
+	github.com/alexcuse/yogo/common v0.0.0-20210126023553-a58452ed180b
 	github.com/goinvest/iexcloud/v2 v2.13.0
 	github.com/sirupsen/logrus v1.7.0
 	github.com/stretchr/testify v1.6.1 // indirect
