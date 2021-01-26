@@ -10,7 +10,7 @@ export default class Tradeview extends React.Component {
       width: 700,
       height: 300,
       symbol: `${symbol}`,
-      interval: "5",
+      interval: "D",
       timezone: "Etc/UTC",
       theme: "light",
       style: "1",
