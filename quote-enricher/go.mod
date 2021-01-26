@@ -7,10 +7,9 @@ replace github.com/goinvest/iexcloud/v2 => github.com/alexcuse/iexcloud/v2 v2.13
 require (
 	github.com/ThreeDotsLabs/watermill v1.1.1
 	github.com/ThreeDotsLabs/watermill-kafka/v2 v2.2.0
-	github.com/alexcuse/yogo/common v0.0.0-20210123182901-5eac3e03f09d
+	github.com/alexcuse/yogo/common v0.0.0-20210126025203-16d51522ef9a
 	github.com/goinvest/iexcloud/v2 v2.13.0
 	github.com/google/uuid v1.1.1
-	gorm.io/datatypes v1.0.0
 	gorm.io/driver/postgres v1.0.6
 	gorm.io/gorm v1.20.11
 )

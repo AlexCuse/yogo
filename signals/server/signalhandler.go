@@ -125,6 +125,20 @@ func (h signalHandler) CurrentByName(ctx *fib.Ctx) error {
 
 	tickers := make([]string, 0)
 
+	//pull full movement + stats
+	// open
+	// close
+	// volume
+	// companyName
+	// mkt cap
+	// 52w high
+	// 52w low
+	// avg10 vol
+	// avg30 vol
+	// ma50
+	// ma200
+	// pe
+	// beta
 	tickerResult := h.db.Select("distinct symbol").Table(
 		"hits",
 	).Where(

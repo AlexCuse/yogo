@@ -6,9 +6,9 @@ import (
 	"github.com/ThreeDotsLabs/watermill-kafka/v2/pkg/kafka"
 	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/alexcuse/yogo/common"
+	"github.com/alexcuse/yogo/common/contracts/db"
 	iex "github.com/goinvest/iexcloud/v2"
 	"github.com/google/uuid"
-	"gorm.io/datatypes"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"time"
@@ -17,7 +17,7 @@ import (
 func main() {
 	cfg, log, wml := common.Bootstrap("configuration.toml")
 
-	db, err := gorm.Open(postgres.Open(cfg.DSN), &gorm.Config{})
+	dbase, err := gorm.Open(postgres.Open(cfg.DSN), &gorm.Config{})
 
 	sub, err := kafka.NewSubscriber(kafka.SubscriberConfig{
 		Brokers:               []string{cfg.BrokerURL},
@@ -59,13 +59,9 @@ func main() {
 
 			var keystats iex.KeyStats
 
-			dbStats := struct {
-				Symbol    string    `gorm:"primaryKey;autoIncrement:false"`
-				QuoteDate time.Time `gorm:"primaryKey;autoIncrement:false;type:date"`
-				Data      datatypes.JSON
-			}{}
+			dbStats := db.Stats{}
 
-			result := db.Select("stats.*").Table(
+			result := dbase.Select("stats.*").Table(
 				"stats",
 			).Where(
 				"symbol = ? and stats.quote_date = ?",
