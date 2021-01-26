@@ -183,31 +183,34 @@ func (server Server) getQuotes() ([]iex.PreviousDay, error) {
 		).Scan(&dbMovement)
 
 		var pd iex.PreviousDay
-		var err error = nil
+		var found = false
 
-		if result.RowsAffected == 0 || result.Error != nil {
-			if result.Error != nil {
-				server.log.Errorf("failed to look up movement from database for %s / %s", w.Symbol, lastTradeDate.Date.String())
+		if result.RowsAffected == 1 && result.Error == nil {
+			server.log.Debugf("got %s movement from DB: %s", w.Symbol, lastTradeDate.Date.String())
+			err = json.Unmarshal(dbMovement.Data, &pd)
+
+			if err != nil {
+				server.log.Errorf("Unable to unmarshal json for %s(%s): %s (%s)", w.Symbol, lastTradeDate.Date.String(), err.Error(), string(dbMovement.Data))
+			} else {
+				found = true
 			}
+		}
+
+		if !found {
 			server.log.Debugf("fetching PreviousDay from IEX: %s", w.Symbol)
 			ctx, cancel := context.WithTimeout(server.appctx, 500*time.Millisecond)
 			pd, err = server.iex.PreviousDay(ctx, w.Symbol)
 
 			if err != nil {
 				server.log.Error(err)
+			} else {
+				found = true
 			}
 
 			cancel()
-		} else {
-			server.log.Debugf("got %s movement from DB: %s", w.Symbol, lastTradeDate.Date.String())
-			err = json.Unmarshal(dbMovement.Data, &pd)
-
-			if err != nil {
-				server.log.Errorf("Unable to unmarshal json for %s(%s): %s (%s)", w.Symbol, lastTradeDate.Date.String(), err.Error(), string(dbMovement.Data))
-			}
 		}
 
-		if pd.Symbol != "" {
+		if found {
 			results = append(results, pd)
 		}
 	}

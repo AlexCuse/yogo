@@ -57,8 +57,6 @@ func main() {
 				continue
 			}
 
-			var keystats iex.KeyStats
-
 			dbStats := db.Stats{}
 
 			result := dbase.Select("stats.*").Table(
@@ -69,21 +67,39 @@ func main() {
 				time.Time(movement.Date),
 			).Scan(&dbStats)
 
-			if result.Error != nil || result.RowsAffected == 0 {
-				if result.Error != nil {
-					log.Errorf("failed to query stats from DB: %s", result.Error.Error())
+			keystats := iex.KeyStats{}
+			found := false
+
+			if result.RowsAffected == 1 && result.Error == nil {
+				log.Debugf("got %s stats from DB: %s", movement.Symbol, movement.Date.String())
+				err = json.Unmarshal(dbStats.Data, &keystats)
+
+				if err != nil {
+					log.Errorf("failed to unmarshal %s (%s) stats: %s", movement.Symbol, movement.Date.String(), err.Error())
+				} else {
+					found = true
 				}
+			}
+
+			if !found {
 				log.Debugf("fetching stats from IEX: %s / %s", movement.Symbol, movement.Date.String())
 				iexClient := iex.NewClient(cfg.IEXToken, iex.WithBaseURL(cfg.IEXBaseURL))
 
 				keystats, err = iexClient.KeyStats(context.Background(), movement.Symbol)
-			} else {
-				log.Debugf("got %s stats from DB: %s", movement.Symbol, movement.Date.String())
-				err = json.Unmarshal(dbStats.Data, &keystats)
+
+				if err != nil {
+					log.Errorf("failed to get %s (%s) stats from IEX: %s", movement.Symbol, movement.Date.String(), err.Error())
+				} else {
+					found = true
+				}
 			}
 
-			if err != nil {
-				log.Errorf("Could not retrieve key stats: %s", err.Error())
+			if !found {
+				errString := "no error"
+				if err != nil {
+					errString = err.Error()
+				}
+				log.Errorf("Could not retrieve key stats: %s", errString)
 				msg.Nack()
 				continue
 			}
