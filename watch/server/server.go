@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+
 	"github.com/alexcuse/yogo/common/config"
 	fib "github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -32,6 +33,8 @@ func NewServer(cfg config.Configuration, appctx context.Context, db *gorm.DB, lo
 	f.Use(cors.New())
 
 	iecli := iex.NewClient(cfg.IEXToken, iex.WithBaseURL(cfg.IEXBaseURL))
+
+	db.AutoMigrate(&Watch{})
 
 	server := Server{
 		db:     db,

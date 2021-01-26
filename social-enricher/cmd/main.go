@@ -15,6 +15,8 @@ import (
 	"github.com/robfig/cron/v3"
 	"github.com/rs/zerolog"
 	"github.com/spf13/viper"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 type config struct {
@@ -44,11 +46,13 @@ func main() {
 	errHandler(err)
 	errHandler(viper.Unmarshal(cfg))
 
+	db, err := gorm.Open(postgres.Open(cfg.DSN), &gorm.Config{})
+
 	symbols := make(chan string)
 	defer close(symbols)
 
-	sentiments := make(chan *social.Sentiment)
-	defer close(sentiments)
+	sentimentSnapshots := make(chan *social.SentimentSnapshot)
+	defer close(sentimentSnapshots)
 
 	f := fib.New()
 	f.Use(cors.New())
@@ -62,7 +66,14 @@ func main() {
 		go symbolApi.Stream(ctx, symbols, twits)
 
 		sentimenter := stocktwits.NewSentimentCalculator()
-		go sentimenter.Stream(ctx, twits, sentiments)
+		go sentimenter.Stream(ctx, twits, sentimentSnapshots)
+	}
+
+	{
+		t, err := social.NewDailySentimentTracker(db)
+		errHandler(err)
+
+		go t.Stream(ctx, sentimentSnapshots)
 	}
 
 	{
@@ -81,28 +92,12 @@ func main() {
 		errHandler(err)
 		go crn.Run()
 
-		calc.Start(ctx)
+		err := calc.Start(ctx)
+		errHandler(err)
 	}
 
 	termChan := make(chan os.Signal, 10)
 	signal.Notify(termChan, syscall.SIGINT, syscall.SIGTERM)
-
-	go func() {
-		log := zerolog.Ctx(ctx).With().Logger()
-		for {
-			select {
-			case <-ctx.Done():
-				return
-			case s, ok := <-sentiments:
-				if !ok {
-					return
-				}
-
-				log.Info().Interface("sentiment", s).Msg("")
-
-			}
-		}
-	}()
 
 	<-termChan
 

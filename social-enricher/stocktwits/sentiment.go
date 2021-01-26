@@ -3,7 +3,6 @@ package stocktwits
 import (
 	"context"
 	"strings"
-	"time"
 
 	"github.com/alexcuse/yogo/social-enricher"
 	"github.com/rs/zerolog"
@@ -16,12 +15,13 @@ func NewSentimentCalculator() SentimentCalculator {
 type SentimentCalculator struct {
 }
 
-func (s *SentimentCalculator) Execute(ctx context.Context, twits *Twits) (*social.Sentiment, error) {
-	result := social.Sentiment{
+func (s *SentimentCalculator) Execute(ctx context.Context, twits *Twits) (*social.SentimentSnapshot, error) {
+	result := social.SentimentSnapshot{
 		Sybmol: twits.Symbol.Symbol,
+		Src:    "stocktwits",
 	}
 
-	result.Timestamp = time.Unix(twits.Cursor.Since, 0)
+	result.Timestamp = twits.Messages[0].CreatedAt
 	for _, m := range twits.Messages {
 		switch strings.ToLower(m.Entities.Sentiment.Basic) {
 		case "bearish":
@@ -34,7 +34,7 @@ func (s *SentimentCalculator) Execute(ctx context.Context, twits *Twits) (*socia
 	return &result, nil
 }
 
-func (s *SentimentCalculator) Stream(ctx context.Context, twits chan *Twits, sentiment chan *social.Sentiment) {
+func (s *SentimentCalculator) Stream(ctx context.Context, twits chan *Twits, sentiment chan *social.SentimentSnapshot) {
 	for {
 		select {
 		case <-ctx.Done():
