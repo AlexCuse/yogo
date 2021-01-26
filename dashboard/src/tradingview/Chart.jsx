@@ -7,7 +7,8 @@ export default class Tradeview extends React.Component {
 
     // eslint-disable-next-line
     new TradingView.widget({
-      autosize: true,
+      width: 700,
+      height: 300,
       symbol: `${symbol}`,
       interval: "5",
       timezone: "Etc/UTC",
@@ -16,7 +17,7 @@ export default class Tradeview extends React.Component {
       locale: "en",
       toolbar_bg: "#f1f3f6",
       enable_publishing: false,
-      allow_symbol_change: true,
+      allow_symbol_change: false,
       container_id: `tradingview_${symbol}`,
     });
   }

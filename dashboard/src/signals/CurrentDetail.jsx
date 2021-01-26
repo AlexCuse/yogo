@@ -45,7 +45,7 @@ export default class CurrentDetail extends React.Component {
         </div>
         <div>
           {signal.active.map((v) => (
-            <Hit symbol={v} key={v} />
+            <Hit hit={v} key={v.symbol} />
           ))}
         </div>
       </div>

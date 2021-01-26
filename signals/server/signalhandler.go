@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/alexcuse/yogo/common/contracts/db"
 	fib "github.com/gofiber/fiber/v2"
+	iex "github.com/goinvest/iexcloud/v2"
 	"gorm.io/gorm/clause"
 )
 
@@ -109,47 +111,71 @@ func (h signalHandler) CurrentByName(ctx *fib.Ctx) error {
 
 	res := Signal{}
 
-	result := h.db.Select("signals.*, hits.symbol").Table(
+	lastMarketDay := struct {
+		Date iex.Date
+	}{}
+
+	dateResult := h.db.Select(`max("date") "date"`).Table("movements").Scan(&lastMarketDay)
+
+	if dateResult.Error != nil {
+		return h.handleError(ctx, dateResult.Error)
+	}
+
+	signalResult := h.db.Select("signals.*, hits.symbol").Table(
 		"hits",
 	).Joins(
 		"left join signals on hits.rule_name = signals.name",
 	).Where(
-		"hits.quote_date = (?) and signals.name = ?",
-		h.db.Select("Max(quote_date)").Table("hits"),
+		"hits.quote_date = ? and signals.name = ?",
+		lastMarketDay.Date,
 		name,
 	).Scan(&res)
 
-	if result.Error != nil {
-		return h.handleError(ctx, result.Error)
+	if signalResult.Error != nil {
+		return h.handleError(ctx, signalResult.Error)
 	}
 
-	tickers := make([]string, 0)
+	movements := make([]db.Movement, 0)
 
-	//pull full movement + stats
-	// open
-	// close
-	// volume
-	// companyName
-	// mkt cap
-	// 52w high
-	// 52w low
-	// avg10 vol
-	// avg30 vol
-	// ma50
-	// ma200
-	// pe
-	// beta
-	tickerResult := h.db.Select("distinct symbol").Table(
-		"hits",
-	).Where(
-		"quote_date = (?) and rule_name = ?",
-		h.db.Select("Max(quote_date)").Table("hits"),
+	movementResult := h.db.Select("movements.*").Table(
+		"movements",
+	).Joins(`inner join hits on hits.symbol = movements.symbol and hits.quote_date = movements."date"`).Where(
+		`hits.quote_date = ? and hits.rule_name = ?`,
+		lastMarketDay.Date,
 		name,
-	).Scan(&tickers)
+	).Order(
+		"movements.symbol",
+	).Scan(&movements)
 
-	if tickerResult.Error != nil {
-		return h.handleError(ctx, result.Error)
+	if movementResult.Error != nil {
+		return h.handleError(ctx, movementResult.Error)
 	}
 
-	return ctx.JSON(SignalDetail{res, tickers})
+	stats := make([]db.Stats, 0)
+
+	statsResult := h.db.Select("*").Table(
+		"stats",
+	).Joins("inner join hits on hits.symbol = stats.symbol and hits.quote_date = stats.quote_date").Where(
+		`hits.quote_date = ? and hits.rule_name = ?`,
+		lastMarketDay.Date,
+		name,
+	).Order(
+		"stats.symbol",
+	).Scan(&stats)
+
+	if statsResult.Error != nil {
+		return h.handleError(ctx, statsResult.Error)
+	}
+
+	output := SignalResult{res, []SignalHit{}}
+
+	for _, mvmt := range movements {
+		for _, stats := range stats {
+			if mvmt.Symbol == stats.Symbol {
+				output.AddHit(mvmt, stats)
+			}
+		}
+	}
+
+	return ctx.JSON(output)
 }
