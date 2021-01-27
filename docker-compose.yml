@@ -73,6 +73,16 @@ services:
     environment:
       - REACT_APP_WATCH_API_URL=http://localhost:50100/
       - REACT_APP_SIGNAL_API_URL=http://localhost:50200/
+  social-enricher:
+    build:
+      context: social-enricher/.
+    depends_on:
+      - kafka
+      - watch
+    restart: always
+    command: ["/yogo-social-enricher"]
+    volumes:
+      - ./debug-configuration.toml:/configuration.toml
   # infra
   zookeeper:
     image: wurstmeister/zookeeper

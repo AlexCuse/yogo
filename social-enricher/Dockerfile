@@ -22,4 +22,4 @@ COPY --from=builder /temp/configuration.toml /.
 
 RUN ls /
 
-CMD [ "/yogo-quote-enricher" ]
+CMD [ "/yogo-social-enricher" ]

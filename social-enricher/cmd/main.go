@@ -21,14 +21,14 @@ import (
 )
 
 type config struct {
-	DSN           string
-	Schedule      string
-	WatchAPI      string
-	StocktwitsAPI string
-	BrokerURL     string
-	QuoteTopic    string
-	SocialTopic   string
-	HistoryTopic  string
+	DSN                string
+	SocialCronSchedule string
+	WatchAPI           string
+	StocktwitsAPI      string
+	BrokerURL          string
+	QuoteTopic         string
+	SocialTopic        string
+	SentimentTopic     string
 }
 
 func main() {
@@ -117,14 +117,14 @@ func main() {
 		go enricher.Execute(ctx, input, cfg.SocialTopic)
 
 		historian := social.NewSentimentHistorian(pub)
-		go historian.Stream(ctx, histSentimentSnapshots, cfg.HistoryTopic)
+		go historian.Stream(ctx, histSentimentSnapshots, cfg.SentimentTopic)
 	}
 
 	{
 		calc := social.NewCalculator(&wl, symbols)
 
 		crn := cron.New()
-		_, err = crn.AddFunc(cfg.Schedule, func() {
+		_, err = crn.AddFunc(cfg.SocialCronSchedule, func() {
 			log := zerolog.Ctx(ctx).With().Time("cron", time.Now()).Logger()
 			ctx := log.WithContext(ctx)
 

@@ -6,6 +6,8 @@ QuoteTopic = "yogo-quotes"
 HitTopic = "yogo-hits"
 ScanTopic = "yogo-scans"
 StatsTopic = "yogo-stats"
+SentimentTopic = "yogo-sentiment"
+SocialTopic = "yogo-social"
 LogLevel = "DEBUG"
 DSN = "host=pg dbname=yogo user=yogo password=yogo"
 SignalPort = 50200
@@ -13,3 +15,6 @@ WatchPort = 50100
 MonitorSource = "markeT"
 MonitorPort = 50000
 MonitorCronSchedule = "30 04 * * 2,3,4,5,6"
+SocialCronSchedule = "*/15 * * * *"
+StocktwitsAPI = "https://api.stocktwits.com"
+WatchAPI = "http://watch:50100"
