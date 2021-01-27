@@ -16,39 +16,38 @@ export default class Hit extends React.Component {
       <div key={hit.symbol}>
         <Card>
           <CardContent>
+            <Typography variant="h5" component="h2">
+              {hit.symbol} ({hit.quoteDate})
+            </Typography>
             <Flippy
               flipOnClick
               flipDirection="horizontal"
-              style={{ height: "340px", width: "750px" }}
+              style={{ height: "340px", width: "100%" }}
             >
               <FrontSide>
-                <Typography variant="h5" component="h2">
-                  {hit.symbol}
-                </Typography>
-                <Typography variant="h6" component="h3">
-                  {hit.companyName} ({hit.quoteDate})
-                </Typography>
-                <Typography>
-                  {hit.open} - {hit.close} ({hit.open / hit.close / hit.open})
-                </Typography>
-                <Typography>Volume: {hit.volume}</Typography>
-                <Typography>Market Cap: {hit.marketCap}</Typography>
-                <Typography>PE: {hit.pe}</Typography>
-                <Typography>Beta: {hit.beta}</Typography>
-                <Typography>
-                  52 week h / l: {hit.high52Wk} / {hit.low52Wk}
-                </Typography>
-                <Typography>50ma: {hit.ma50}</Typography>
-                <Typography>200ma: {hit.ma200}</Typography>
-                <Typography>
-                  Avg Vol 10 / 30: {hit.avg10Vol} / {hit.avg30Vol}
-                </Typography>
+                <div style={{ float: "left", margin: "10px" }}>
+                  <Typography variant="h6" component="h3">
+                    {hit.companyName}
+                  </Typography>
+                  <Typography>
+                    {hit.open} - {hit.close} ({hit.open / hit.close / hit.open})
+                  </Typography>
+                  <Typography>Volume: {hit.volume}</Typography>
+                  <Typography>Market Cap: {hit.marketCap}</Typography>
+                  <Typography>PE: {hit.pe}</Typography>
+                  <Typography>Beta: {hit.beta}</Typography>
+                  <Typography>
+                    52 week h / l: {hit.high52Wk} / {hit.low52Wk}
+                  </Typography>
+                  <Typography>50ma: {hit.ma50}</Typography>
+                  <Typography>200ma: {hit.ma200}</Typography>
+                  <Typography>
+                    Avg Vol 10 / 30: {hit.avg10Vol} / {hit.avg30Vol}
+                  </Typography>
+                </div>
               </FrontSide>
               <BackSide style={{ top: "0px" }}>
-                <Typography>
-                  {hit.symbol} ({hit.quoteDate})
-                </Typography>
-                <div>
+                <div style={{ float: "left", margin: "10px" }}>
                   <Chart symbol={hit.symbol} key={hit.symbol} />
                 </div>
               </BackSide>

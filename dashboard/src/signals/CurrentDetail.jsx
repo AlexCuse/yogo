@@ -24,7 +24,6 @@ export default class CurrentDetail extends React.Component {
     fetch(this.signalUrl)
       .then((response) => response.json())
       .then((data) => {
-        console.log(data);
         this.setState({
           signal: data,
         });

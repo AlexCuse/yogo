@@ -7,7 +7,6 @@ export default class Tradeview extends React.Component {
 
     // eslint-disable-next-line
     new TradingView.widget({
-      width: 700,
       height: 300,
       symbol: `${symbol}`,
       interval: "D",
