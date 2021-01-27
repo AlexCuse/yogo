@@ -1,5 +1,9 @@
 
-Schedule = "30 04 * * 2,3,4,5,6"
+Schedule = "*/5 * * * *"
 WatchAPI = "http://localhost:50100"
 StocktwitsAPI = "https://api.stocktwits.com"
 DSN = "host=localhost user=yogo password=yogo dbname=yogo port=5432 sslmode=disable"
+BrokerURL = "localhost:9092"
+QuoteTopic = "yogo-stats"
+SocialTopic = "yogo-social"
+HistoryTopic = "yogo-sentiment"

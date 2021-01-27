@@ -19,7 +19,7 @@ type SymbolApi struct {
 	c *resty.Client
 }
 
-func (s *SymbolApi) Get(ctx context.Context, symbol string) (*Twits, error) {
+func (s *SymbolApi) Get(ctx context.Context, symbol string) (Twits, error) {
 	twits := Twits{}
 
 	r, err := s.c.R().
@@ -27,16 +27,16 @@ func (s *SymbolApi) Get(ctx context.Context, symbol string) (*Twits, error) {
 		SetResult(&twits).
 		Get(fmt.Sprintf("/api/2/streams/symbol/%v.json", symbol))
 	if err != nil {
-		return &twits, fmt.Errorf("fetching stocktwits for %v:%w", symbol, err)
+		return twits, fmt.Errorf("fetching stocktwits for %v:%w", symbol, err)
 	}
 	if !r.IsSuccess() {
-		return &twits, fmt.Errorf("fetching stocktwits for %v, status code %v", symbol, r.Status())
+		return twits, fmt.Errorf("fetching stocktwits for %v, status code %v", symbol, r.Status())
 	}
 
-	return &twits, nil
+	return twits, nil
 }
 
-func (s *SymbolApi) Stream(ctx context.Context, symbols chan string, twits chan *Twits) {
+func (s *SymbolApi) Stream(ctx context.Context, symbols <-chan string, twits chan Twits) {
 	for {
 		select {
 		case <-ctx.Done():
@@ -46,7 +46,7 @@ func (s *SymbolApi) Stream(ctx context.Context, symbols chan string, twits chan 
 				return
 			}
 			log := zerolog.Ctx(ctx).With().Str("symbol", sym).Logger()
-			ctx = log.WithContext(ctx)
+			ctx := log.WithContext(ctx)
 
 			r, err := s.Get(ctx, sym)
 			if err != nil {
@@ -54,6 +54,8 @@ func (s *SymbolApi) Stream(ctx context.Context, symbols chan string, twits chan 
 			}
 
 			twits <- r
+
+			log.Debug().Msg("new twits")
 		}
 	}
 }

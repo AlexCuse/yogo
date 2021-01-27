@@ -15,10 +15,14 @@ func NewSentimentCalculator() SentimentCalculator {
 type SentimentCalculator struct {
 }
 
-func (s *SentimentCalculator) Execute(ctx context.Context, twits *Twits) (*social.SentimentSnapshot, error) {
+func (s *SentimentCalculator) Execute(ctx context.Context, twits Twits) (social.SentimentSnapshot, error) {
 	result := social.SentimentSnapshot{
 		Sybmol: twits.Symbol.Symbol,
 		Src:    "stocktwits",
+	}
+
+	if len(twits.Messages) == 0 {
+		return result, nil
 	}
 
 	result.Timestamp = twits.Messages[0].CreatedAt
@@ -31,10 +35,10 @@ func (s *SentimentCalculator) Execute(ctx context.Context, twits *Twits) (*socia
 		}
 	}
 
-	return &result, nil
+	return result, nil
 }
 
-func (s *SentimentCalculator) Stream(ctx context.Context, twits chan *Twits, sentiment chan *social.SentimentSnapshot) {
+func (s *SentimentCalculator) Stream(ctx context.Context, twits <-chan Twits, sentiment chan social.SentimentSnapshot) {
 	for {
 		select {
 		case <-ctx.Done():
@@ -44,7 +48,7 @@ func (s *SentimentCalculator) Stream(ctx context.Context, twits chan *Twits, sen
 				return
 			}
 			log := zerolog.Ctx(ctx).With().Str("symbol", t.Symbol.Symbol).Logger()
-			ctx = log.WithContext(ctx)
+			ctx := log.WithContext(ctx)
 
 			r, err := s.Execute(ctx, t)
 			if err != nil {
@@ -52,6 +56,8 @@ func (s *SentimentCalculator) Stream(ctx context.Context, twits chan *Twits, sen
 			}
 
 			sentiment <- r
+
+			log.Debug().Msg("snapshot")
 		}
 	}
 }
