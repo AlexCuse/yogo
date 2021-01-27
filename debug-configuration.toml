@@ -1,5 +1,5 @@
 
-IEXToken = "pk_f191408ce9df43e9907b70b0f4fb6f3f"
+IEXToken = ""
 IEXBaseURL = "https://cloud.iexapis.com/v1"
 BrokerURL = "kafka:9092"
 QuoteTopic = "yogo-quotes"
@@ -12,4 +12,4 @@ SignalPort = 50200
 WatchPort = 50100
 MonitorSource = "markeT"
 MonitorPort = 50000
-MonitorCronPattern = "30 04 * * 2,3,4,5,6"
+MonitorCronSchedule = "30 04 * * 2,3,4,5,6"

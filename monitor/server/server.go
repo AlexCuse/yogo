@@ -69,11 +69,13 @@ func NewServer(cfg config.Configuration, appctx context.Context, log *logrus.Log
 	return server
 }
 func (server Server) Run() error {
-	crn := cron.New()
+	go func(s Server) {
+		crn := cron.New(cron.WithLocation(time.FixedZone("Eastern", -5*60*60)))
 
-	crn.AddFunc(server.cfg.MonitorCronSchedule, server.watch)
+		crn.AddFunc(s.cfg.MonitorCronSchedule, s.watch)
 
-	go crn.Run()
+		crn.Run()
+	}(server)
 
 	f := fib.New()
 	f.Use(cors.New())
