@@ -14,6 +14,7 @@ import List from "@material-ui/core/List";
 import Watchlist from "./watch/Watchlist";
 import Current from "./signals/Current";
 import CurrentDetail from "./signals/CurrentDetail";
+import Detail from "./symbol/Detail";
 
 function App() {
   return (
@@ -40,6 +41,7 @@ function App() {
           <Route exact path="/watch" component={Watchlist} />
           <Route exact path="/signals/:name/detail" component={CurrentDetail} />
           <Route exact path="/signals" component={Current} />
+          <Route exact path="/symbol/:symbol" component={Detail} />
         </Switch>
       </Router>
     </Container>

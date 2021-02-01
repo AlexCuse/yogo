@@ -4,6 +4,8 @@ import Flippy, { FrontSide, BackSide } from "react-flippy-material-ui";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
 import Typography from "@material-ui/core/Typography";
+import { Link as RouterLink } from "react-router-dom";
+import Link from "@material-ui/core/Link";
 import MiniChart from "../tradingview/MiniChart";
 
 // TODO: figure out how to use props in stateless func - can we skip prop type?
@@ -17,7 +19,10 @@ export default class Hit extends React.Component {
         <Card>
           <CardContent>
             <Typography variant="h5" component="h2">
-              {hit.symbol} ({hit.quoteDate})
+              {hit.symbol} ({hit.quoteDate}){" "}
+              <Link component={RouterLink} to={`/symbol/${hit.symbol}`}>
+                (detail)
+              </Link>
             </Typography>
             <Flippy
               flipOnClick
