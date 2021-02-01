@@ -3,8 +3,12 @@ import "./App.css";
 import Container from "@material-ui/core/Container";
 import Typography from "@material-ui/core/Typography";
 import Box from "@material-ui/core/Box";
-import { MemoryRouter as Router } from "react-router";
-import { Link as RouterLink, Route, Switch } from "react-router-dom";
+import {
+  Link as RouterLink,
+  BrowserRouter as Router,
+  Route,
+  Switch,
+} from "react-router-dom";
 import Link from "@material-ui/core/Link";
 import List from "@material-ui/core/List";
 import Watchlist from "./watch/Watchlist";
@@ -34,11 +38,7 @@ function App() {
         </List>
         <Switch>
           <Route exact path="/watch" component={Watchlist} />
-          <Route
-            exact
-            path="/signals/:name/detail"
-            component={CurrentDetail}
-          />
+          <Route exact path="/signals/:name/detail" component={CurrentDetail} />
           <Route exact path="/signals" component={Current} />
         </Switch>
       </Router>
