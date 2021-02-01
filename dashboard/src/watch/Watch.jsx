@@ -5,7 +5,7 @@ import CardContent from "@material-ui/core/CardContent";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 import PropTypes from "prop-types";
-import Chart from "../tradingview/Chart";
+import MiniChart from "../tradingview/MiniChart";
 
 export default function Watch({ symbol }) {
   return (
@@ -14,7 +14,7 @@ export default function Watch({ symbol }) {
         <Typography variant="h5" component="h2">
           {symbol}
         </Typography>
-        <Chart symbol={symbol} />
+        <MiniChart symbol={symbol} />
       </CardContent>
       <CardActions>
         <Button size="small">Learn More</Button>

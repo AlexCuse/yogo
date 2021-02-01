@@ -4,7 +4,7 @@ import Flippy, { FrontSide, BackSide } from "react-flippy-material-ui";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
 import Typography from "@material-ui/core/Typography";
-import Chart from "../tradingview/Chart";
+import MiniChart from "../tradingview/MiniChart";
 
 // TODO: figure out how to use props in stateless func - can we skip prop type?
 // eslint-disable-next-line react/prefer-stateless-function
@@ -48,7 +48,7 @@ export default class Hit extends React.Component {
               </FrontSide>
               <BackSide style={{ top: "0px" }}>
                 <div style={{ float: "left", margin: "10px" }}>
-                  <Chart symbol={hit.symbol} key={hit.symbol} />
+                  <MiniChart symbol={hit.symbol} key={hit.symbol} />
                 </div>
               </BackSide>
             </Flippy>
