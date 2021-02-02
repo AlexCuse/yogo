@@ -26,6 +26,12 @@ test-quote-enricher:
 	gofmt -l quote-enricher/
 	[ "`gofmt -l quote-enricher/`" = "" ]
 
+test-social-enricher:
+	cd social-enricher && $(GO) test ./...
+	cd social-enricher && $(GO) vet ./...
+	gofmt -l social-enricher/
+	[ "`gofmt -l social-enricher/`" = "" ]
+
 test-history:
 	cd history && $(GO) test ./...
 	cd history && $(GO) vet ./...
@@ -47,7 +53,7 @@ test-signals:
 test-dashboard:
 	cd dashboard && npm install && npm run-script build
 
-test: test-common test-scanner test-monitor test-quote-enricher test-history test-watch test-signals test-dashboard
+test: test-common test-scanner test-monitor test-quote-enricher test-social-enricher test-history test-watch test-signals test-dashboard
 
 PHONY: docker-compose-build
 docker-compose-build:
