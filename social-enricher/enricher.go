@@ -75,7 +75,7 @@ func (e *Enricher) Execute(ctx context.Context, input <-chan *message.Message, s
 			m["social"] = social
 			enrichedPayload, err := json.Marshal(m)
 			if err != nil {
-				log.Error().Err(err).Interface("message", m).Msgf("could not to json", socialTopic)
+				log.Error().Err(err).Interface("message", m).Msgf("could marshal not to json for topic %s", socialTopic)
 				msg.Nack()
 				continue
 			}

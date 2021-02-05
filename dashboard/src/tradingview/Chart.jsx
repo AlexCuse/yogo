@@ -1,13 +1,14 @@
 import React from "react";
 import PropTypes from "prop-types";
 
-export default class Tradeview extends React.Component {
+export default class Chart extends React.Component {
   componentDidMount() {
     const { symbol } = this.props;
 
     // eslint-disable-next-line
     new TradingView.widget({
-      height: 300,
+      height: 600,
+      width: 750,
       symbol: `${symbol}`,
       interval: "D",
       timezone: "Etc/UTC",
@@ -32,6 +33,6 @@ export default class Tradeview extends React.Component {
   }
 }
 
-Tradeview.propTypes = {
+Chart.propTypes = {
   symbol: PropTypes.string.isRequired,
 };
