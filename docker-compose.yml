@@ -2,68 +2,86 @@ version: "2.2"
 services:
   monitor:
     build:
-      context: monitor/.
+      context: go
+      dockerfile: ./Dockerfile
+      args:
+        project: monitor
     depends_on:
       - kafka
     ports:
       - "50000:50000"
     restart: always
-    command: ["/yogo-monitor"]
+    command: ["/service"]
     volumes:
       - ./debug-configuration.toml:/configuration.toml
   watch:
     build:
-      context: watch/.
+      context: go
+      dockerfile: ./Dockerfile
+      args:
+        project: watch
     depends_on:
       - pg
     ports:
       - "50100:50100"
     restart: always
-    command: ["/yogo-watch"]
+    command: ["/service"]
     volumes:
       - ./debug-configuration.toml:/configuration.toml
   quote-enricher:
     build:
-      context: quote-enricher/.
+      context: go
+      dockerfile: ./Dockerfile
+      args:
+        project: quote-enricher
     depends_on:
       - kafka
     restart: always
-    command: ["/yogo-quote-enricher"]
+    command: ["/service"]
     volumes:
       - ./debug-configuration.toml:/configuration.toml
   scanner:
     build:
-      context: scanner/.
+      context: go
+      dockerfile: ./Dockerfile
+      args:
+        project: scanner
     depends_on:
       - kafka
     restart: always
-    command: ["/yogo-scanner"]
+    command: ["/service"]
     volumes:
       - ./debug-configuration.toml:/configuration.toml
   signals:
     build:
-      context: signals/.
+      context: go
+      dockerfile: ./Dockerfile
+      args:
+        project: signals
     depends_on:
       - pg
     ports:
       - "50200:50200"
     restart: always
-    command: ["/yogo-signals"]
+    command: ["/service"]
     volumes:
       - ./debug-configuration.toml:/configuration.toml
   history:
     build:
-      context: history/.
+      context: go
+      dockerfile: ./Dockerfile
+      args:
+        project: history
     depends_on:
       - kafka
       - pg
     restart: always
-    command: ["/yogo-history"]
+    command: ["/service"]
     volumes:
       - ./debug-configuration.toml:/configuration.toml
   dashboard:
     build:
-      context: dashboard/.
+      context: web/dashboard/.
     depends_on:
       - watch
       - signals
@@ -75,12 +93,15 @@ services:
       - REACT_APP_SIGNAL_API_URL=http://localhost:50200/
   social-enricher:
     build:
-      context: social-enricher/.
+      context: go
+      dockerfile: ./Dockerfile
+      args:
+        project: social-enricher
     depends_on:
       - kafka
       - watch
     restart: always
-    command: ["/yogo-social-enricher"]
+    command: ["/service"]
     volumes:
       - ./debug-configuration.toml:/configuration.toml
   # infra
