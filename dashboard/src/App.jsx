@@ -15,16 +15,19 @@ import Watchlist from "./watch/Watchlist";
 import Current from "./signals/Current";
 import CurrentDetail from "./signals/CurrentDetail";
 import Detail from "./symbol/Detail";
+import MarketOverview from "./tradingview/MarketOverview";
 
 function App() {
   return (
     <Container>
-      <Box my={4}>
-        <Typography variant="h4" component="h1" gutterBottom>
-          yogo ¯\_(ツ)_/¯
-        </Typography>
-      </Box>
       <Router>
+        <Box my={4}>
+          <Typography variant="h4" component="h1" gutterBottom>
+            <Link component={RouterLink} to="/">
+              yogo ¯\_(ツ)_/¯
+            </Link>
+          </Typography>
+        </Box>
         <List>
           <Typography>
             <Link component={RouterLink} to="/watch">
@@ -42,6 +45,7 @@ function App() {
           <Route exact path="/signals/:name/detail" component={CurrentDetail} />
           <Route exact path="/signals" component={Current} />
           <Route exact path="/symbol/:symbol" component={Detail} />
+          <Route exact path="/" component={MarketOverview} />
         </Switch>
       </Router>
     </Container>
