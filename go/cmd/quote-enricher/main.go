@@ -39,7 +39,7 @@ func main() {
 	}
 
 	cfg := Config{}
-	errHandler(configuration.Unmarshal(cfg))
+	errHandler(configuration.Unmarshal(&cfg))
 
 	dbase, err := gorm.Open(postgres.Open(cfg.DSN), &gorm.Config{})
 	errHandler(err)
