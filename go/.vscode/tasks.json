@@ -1,0 +1,72 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "taskName": "test-fix-build",
+            "command": "make test fix build",
+            "type": "shell",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "taskName": "build history",
+            "command": "go build cmd/history/main.go",
+            "type": "shell",
+            "group": {
+                "kind": "build"
+            },
+        },
+        {
+            "taskName": "build monitor",
+            "command": "go build cmd/monitor/main.go",
+            "type": "shell",
+            "group": {
+                "kind": "build"
+            },
+        },
+        {
+            "taskName": "build quote-enricher",
+            "command": "go build cmd/quote-enricher/main.go",
+            "type": "shell",
+            "group": {
+                "kind": "build"
+            },
+        },
+        {
+            "taskName": "build scanner",
+            "command": "go build cmd/scanner/main.go",
+            "type": "shell",
+            "group": {
+                "kind": "build"
+            },
+        },
+        {
+            "taskName": "build signals",
+            "command": "go build cmd/signals/main.go",
+            "type": "shell",
+            "group": {
+                "kind": "build"
+            },
+        },
+        {
+            "taskName": "build social-enricher",
+            "command": "go build cmd/social-enricher/main.go",
+            "type": "shell",
+            "group": {
+                "kind": "build"
+            },
+        },
+        {
+            "taskName": "build watch",
+            "command": "go build cmd/watch/main.go",
+            "type": "shell",
+            "group": {
+                "kind": "build"
+            },
+        }
+    ]
+}
