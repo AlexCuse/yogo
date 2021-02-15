@@ -95,7 +95,7 @@ type DailySentimentAggregator struct {
 
 func (t *DailySentimentAggregator) Get(symbol string) (DailySentiment, error) {
 	s := DailySentiment{}
-	_, err := t.store.Get(symbol, s)
+	_, err := t.store.Get(symbol, &s)
 	if err != nil {
 		return s, err
 	}
