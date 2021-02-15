@@ -4,12 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/alexcuse/yogo/internal/pkg/messaging"
 	"io/ioutil"
 	"net/http"
 	"strings"
 	"time"
 
-	"github.com/ThreeDotsLabs/watermill-kafka/v2/pkg/kafka"
 	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/alexcuse/yogo/internal/pkg/db"
 	"github.com/alexdrl/zerowater"
@@ -55,12 +55,9 @@ type Server struct {
 func NewServer(cfg *Configuration, appctx context.Context, log zerolog.Logger) Server {
 	f := fib.New()
 
-	pub, err := kafka.NewPublisher(kafka.PublisherConfig{
-		Brokers:               []string{cfg.BrokerURL},
-		Marshaler:             kafka.DefaultMarshaler{},
-		OverwriteSaramaConfig: kafka.DefaultSaramaSyncPublisherConfig(),
-	}, zerowater.NewZerologLoggerAdapter(log))
+	pub, err := messaging.NewPublisher(cfg.BrokerURL, "monitor", zerowater.NewZerologLoggerAdapter(log))
 	if err != nil {
+		log.Error().Msgf("Failed to connect to %s: %s", cfg.BrokerURL, err.Error())
 		panic(err)
 	}
 

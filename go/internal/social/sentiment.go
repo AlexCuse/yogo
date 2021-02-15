@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/ThreeDotsLabs/watermill-kafka/v2/pkg/kafka"
 	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/google/uuid"
 	"github.com/rs/zerolog"
@@ -143,14 +142,14 @@ func (t *DailySentimentAggregator) Stream(ctx context.Context, sentiments <-chan
 	}
 }
 
-func NewSentimentHistorian(pub *kafka.Publisher) SentimentHistorian {
+func NewSentimentHistorian(pub message.Publisher) SentimentHistorian {
 	return SentimentHistorian{
 		pub: pub,
 	}
 }
 
 type SentimentHistorian struct {
-	pub *kafka.Publisher
+	pub message.Publisher
 }
 
 func (h *SentimentHistorian) Stream(ctx context.Context, sentiments <-chan SentimentSnapshot, topic string) {

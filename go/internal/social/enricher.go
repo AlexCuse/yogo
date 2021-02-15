@@ -4,14 +4,13 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/ThreeDotsLabs/watermill-kafka/v2/pkg/kafka"
 	"github.com/ThreeDotsLabs/watermill/message"
 	iex "github.com/goinvest/iexcloud/v2"
 	"github.com/google/uuid"
 	"github.com/rs/zerolog"
 )
 
-func NewEnricher(dl DailySentimenter, pub *kafka.Publisher) Enricher {
+func NewEnricher(dl DailySentimenter, pub message.Publisher) Enricher {
 	return Enricher{
 		dl:  dl,
 		pub: pub,
@@ -20,7 +19,7 @@ func NewEnricher(dl DailySentimenter, pub *kafka.Publisher) Enricher {
 
 type Enricher struct {
 	dl  DailySentimenter
-	pub *kafka.Publisher
+	pub message.Publisher
 }
 
 func (e *Enricher) Execute(ctx context.Context, input <-chan *message.Message, socialTopic string) {

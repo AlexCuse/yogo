@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/alexcuse/yogo/internal/pkg/messaging"
 	"os"
 	"os/signal"
 	"syscall"
@@ -10,7 +11,6 @@ import (
 	"github.com/alexcuse/yogo/internal/pkg/configuration"
 	"github.com/alexcuse/yogo/internal/pkg/logging"
 
-	"github.com/ThreeDotsLabs/watermill-kafka/v2/pkg/kafka"
 	"github.com/alexcuse/yogo/internal/social"
 	"github.com/alexcuse/yogo/internal/social/stocktwits"
 	"github.com/alexdrl/zerowater"
@@ -48,18 +48,10 @@ func main() {
 	errHandler(configuration.Unmarshal(cfg))
 
 	wml := zerowater.NewZerologLoggerAdapter(log)
-	sub, err := kafka.NewSubscriber(kafka.SubscriberConfig{
-		Brokers:               []string{cfg.BrokerURL},
-		Unmarshaler:           kafka.DefaultMarshaler{},
-		OverwriteSaramaConfig: kafka.DefaultSaramaSubscriberConfig(),
-	}, wml)
+	sub, err := messaging.NewSubscriber(cfg.BrokerURL, "social-enricher", wml)
 	errHandler(err)
 
-	pub, err := kafka.NewPublisher(kafka.PublisherConfig{
-		Brokers:               []string{cfg.BrokerURL},
-		Marshaler:             kafka.DefaultMarshaler{},
-		OverwriteSaramaConfig: kafka.DefaultSaramaSyncPublisherConfig(),
-	}, wml)
+	pub, err := messaging.NewPublisher(cfg.BrokerURL, "social-enricher", wml)
 	errHandler(err)
 
 	kvStore := gokv_syncmap.NewStore(gokv_syncmap.DefaultOptions)

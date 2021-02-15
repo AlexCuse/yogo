@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-
 	"github.com/alexcuse/yogo/internal/pkg/configuration"
 	"github.com/alexcuse/yogo/internal/pkg/logging"
 
@@ -23,6 +22,9 @@ func main() {
 	errHandler(configuration.Unmarshal(cfg))
 
 	server, err := scanner.NewServer(cfg, ctx, log)
+	if err != nil {
+		log.Error().Err(err).Msgf("Failed to connect to broker: %s", cfg.BrokerURL)
+	}
 	errHandler(err)
 
 	errHandler(server.Run())

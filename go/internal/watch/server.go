@@ -39,7 +39,11 @@ func NewServer(cfg *Configuration, appctx context.Context, db *gorm.DB, log zero
 
 	iecli := iex.NewClient(cfg.IEXToken, iex.WithBaseURL(cfg.IEXBaseURL))
 
-	db.AutoMigrate(&Watch{})
+	err := db.AutoMigrate(&Watch{})
+
+	if err != nil {
+		panic(err)
+	}
 
 	server := Server{
 		db:     db,
