@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"github.com/alexcuse/yogo/internal/pkg/messaging"
 	"time"
 
 	"github.com/alexcuse/yogo/internal/pkg/configuration"
@@ -14,7 +15,6 @@ import (
 	"github.com/alexdrl/zerowater"
 	"github.com/rs/zerolog"
 
-	"github.com/ThreeDotsLabs/watermill-kafka/v2/pkg/kafka"
 	iex "github.com/goinvest/iexcloud/v2"
 	"gorm.io/datatypes"
 	"gorm.io/driver/postgres"
@@ -46,11 +46,7 @@ func main() {
 	errHandler(configuration.Unmarshal(cfg))
 
 	wml := zerowater.NewZerologLoggerAdapter(log)
-	sub, err := kafka.NewSubscriber(kafka.SubscriberConfig{
-		Brokers:               []string{cfg.BrokerURL},
-		Unmarshaler:           kafka.DefaultMarshaler{},
-		OverwriteSaramaConfig: kafka.DefaultSaramaSubscriberConfig(),
-	}, wml)
+	sub, err := messaging.NewSubscriber(cfg.BrokerURL, "history", wml)
 	if err != nil {
 		panic(err)
 	}

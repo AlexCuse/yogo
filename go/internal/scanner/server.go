@@ -4,11 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/alexcuse/yogo/internal/pkg/messaging"
 	"io/ioutil"
 	"net/http"
 	"time"
 
-	"github.com/ThreeDotsLabs/watermill-kafka/v2/pkg/kafka"
 	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/alexdrl/zerowater"
 	"github.com/google/uuid"
@@ -27,28 +27,20 @@ type Server struct {
 	appctx       context.Context
 	scans        []*Scan
 	scansInvalid time.Time
-	sub          *kafka.Subscriber
-	pub          *kafka.Publisher
+	sub          message.Subscriber
+	pub          message.Publisher
 	cfg          *Configuration
 }
 
 func NewServer(cfg *Configuration, appctx context.Context, log zerolog.Logger) (Server, error) {
 	wml := zerowater.NewZerologLoggerAdapter(log)
 
-	sub, err := kafka.NewSubscriber(kafka.SubscriberConfig{
-		Brokers:               []string{cfg.BrokerURL},
-		Unmarshaler:           kafka.DefaultMarshaler{},
-		OverwriteSaramaConfig: kafka.DefaultSaramaSubscriberConfig(),
-	}, wml)
+	sub, err := messaging.NewSubscriber(cfg.BrokerURL, "scanner", wml)
 	if err != nil {
 		return Server{}, err
 	}
 
-	pub, err := kafka.NewPublisher(kafka.PublisherConfig{
-		Brokers:               []string{cfg.BrokerURL},
-		Marshaler:             kafka.DefaultMarshaler{},
-		OverwriteSaramaConfig: kafka.DefaultSaramaSyncPublisherConfig(),
-	}, wml)
+	pub, err := messaging.NewPublisher(cfg.BrokerURL, "scanner", wml)
 	if err != nil {
 		return Server{}, err
 	}

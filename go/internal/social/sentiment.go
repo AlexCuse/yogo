@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/ThreeDotsLabs/watermill-kafka/v2/pkg/kafka"
 	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/google/uuid"
 	"github.com/rs/zerolog"
@@ -96,7 +95,7 @@ type DailySentimentAggregator struct {
 
 func (t *DailySentimentAggregator) Get(symbol string) (DailySentiment, error) {
 	s := DailySentiment{}
-	_, err := t.store.Get(symbol, s)
+	_, err := t.store.Get(symbol, &s)
 	if err != nil {
 		return s, err
 	}
@@ -143,14 +142,14 @@ func (t *DailySentimentAggregator) Stream(ctx context.Context, sentiments <-chan
 	}
 }
 
-func NewSentimentHistorian(pub *kafka.Publisher) SentimentHistorian {
+func NewSentimentHistorian(pub message.Publisher) SentimentHistorian {
 	return SentimentHistorian{
 		pub: pub,
 	}
 }
 
 type SentimentHistorian struct {
-	pub *kafka.Publisher
+	pub message.Publisher
 }
 
 func (h *SentimentHistorian) Stream(ctx context.Context, sentiments <-chan SentimentSnapshot, topic string) {

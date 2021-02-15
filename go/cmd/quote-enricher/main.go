@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"github.com/alexcuse/yogo/internal/pkg/messaging"
 	"time"
 
 	"github.com/alexcuse/yogo/internal/pkg/configuration"
@@ -10,7 +11,6 @@ import (
 	"github.com/alexcuse/yogo/internal/pkg/logging"
 	"github.com/alexdrl/zerowater"
 
-	"github.com/ThreeDotsLabs/watermill-kafka/v2/pkg/kafka"
 	"github.com/ThreeDotsLabs/watermill/message"
 	iex "github.com/goinvest/iexcloud/v2"
 	"github.com/google/uuid"
@@ -45,21 +45,13 @@ func main() {
 	errHandler(err)
 
 	wml := zerowater.NewZerologLoggerAdapter(log)
-	sub, err := kafka.NewSubscriber(kafka.SubscriberConfig{
-		Brokers:               []string{cfg.BrokerURL},
-		Unmarshaler:           kafka.DefaultMarshaler{},
-		OverwriteSaramaConfig: kafka.DefaultSaramaSubscriberConfig(),
-	}, wml)
+	sub, err := messaging.NewSubscriber(cfg.BrokerURL, "quote-enricher", wml)
 
 	if err != nil {
 		panic(err)
 	}
 
-	pub, err := kafka.NewPublisher(kafka.PublisherConfig{
-		Brokers:               []string{cfg.BrokerURL},
-		Marshaler:             kafka.DefaultMarshaler{},
-		OverwriteSaramaConfig: kafka.DefaultSaramaSyncPublisherConfig(),
-	}, wml)
+	pub, err := messaging.NewPublisher(cfg.BrokerURL, "quote-enricher", wml)
 
 	if err != nil {
 		panic(err)
