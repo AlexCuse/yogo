@@ -110,10 +110,11 @@ services:
       - ./debug-configuration.toml:/configuration.toml
   # infra
   broker:
-    image: rabbitmq
+    image: nats-streaming:0.11.2
     restart: always
     ports:
-      - "5672"
+      - "4222"
+      - "8222"
 
   pg:
     image: postgres

@@ -118,14 +118,10 @@ func (server Server) watch() {
 		return
 	}
 
-	market, err := server.getQuotes()
+	_, err = server.getQuotes()
 	if err != nil {
 		server.log.Error().Err(err).Msg("server.getQuotes")
 		return
-	}
-
-	for _, t := range market {
-		server.quote(t)
 	}
 }
 
@@ -137,6 +133,7 @@ func (server Server) getQuotes() ([]iex.PreviousDay, error) {
 
 		if err == nil {
 			for _, q := range res {
+				server.quote(q)
 				if r := server.db.WithContext(server.appctx).Clauses(clause.OnConflict{DoNothing: true}).Create(db.Asset{Symbol: q.Symbol}); r.Error != nil {
 					server.log.Error().Err(err).Msg("unable to persist asset")
 				}
@@ -229,6 +226,7 @@ func (server Server) getQuotes() ([]iex.PreviousDay, error) {
 		}
 
 		if found {
+			server.quote(pd)
 			results = append(results, pd)
 		}
 	}
