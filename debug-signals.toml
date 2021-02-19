@@ -1,2 +1,0 @@
-
-HighVolumeGain5 = "((Quote.Close - Quote.Open) / Quote.Open) > .05 and ((Quote.Volume - Stats.Avg10Volume) / Stats.Avg10Volume) > .05"
